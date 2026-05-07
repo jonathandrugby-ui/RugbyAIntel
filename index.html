@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Rugby Intelligence System</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏉</text></svg>" />
+  <style>
+    body { margin: 0; background: #050806; }
+    #root { min-height: 100vh; }
+    #loader {
+      position: fixed; inset: 0; background: #050806;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-family: 'Courier New', monospace; color: #3a5040; font-size: 11px; letter-spacing: 2px;
+      z-index: 9999;
+    }
+    #loader-ring {
+      width: 36px; height: 36px; border: 2px solid #1c2e1c;
+      border-top-color: #00c44a; border-radius: 50%;
+      animation: spin 1.2s linear infinite; margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="loader">
+    <div id="loader-ring"></div>
+    RUGBY INTELLIGENCE
+  </div>
+  <div id="root"></div>
+
+  <!-- React 18 + ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- Babel standalone for JSX transpilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- App (loaded via Babel, rendered after parse) -->
+  <script type="text/babel" src="App.jsx" data-presets="react" data-type="module"></script>
+</body>
+</html>
