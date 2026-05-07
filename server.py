@@ -24,6 +24,14 @@ class Handler(SimpleHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print(f"  {args[0]} {args[1]} {args[2]}")
 
+    def do_GET(self):
+        # Serve index.html for any path that isn't a real file (SPA fallback)
+        from pathlib import Path as P
+        path = self.path.split("?")[0].lstrip("/")
+        if path and not P(path).exists() and "." not in P(path).suffix:
+            self.path = "/index.html"
+        super().do_GET()
+
     def do_OPTIONS(self):
         self.send_response(200)
         self._cors()

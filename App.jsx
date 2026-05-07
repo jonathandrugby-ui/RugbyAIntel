@@ -932,7 +932,7 @@ function RIS() {
       <div className="section">
         <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:16}}>
           <button className="btn-sm" onClick={()=>setAnalyseStep('select')}>← Back</button>
-          <span style={{fontFamily:'var(--fh)',fontSize:20,letterSpacing:1,color:'var(--t)')}>⚡ MATCH LOGGER</span>
+          <span style={{fontFamily:'var(--fh)',fontSize:20,letterSpacing:1,color:'var(--t)'}}>⚡ MATCH LOGGER</span>
           {matchEvents.length>0&&<button className="btn-sm red" style={{marginLeft:'auto'}} onClick={()=>{setMatchEvents([]);setLogCat(null);setLogSkill(null);}}>Clear</button>}
         </div>
 
@@ -1012,7 +1012,7 @@ function RIS() {
       <div className="section">
         <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:16}}>
           <button className="btn-sm" onClick={()=>setAnalyseStep('select')}>← Back</button>
-          <span style={{fontFamily:'var(--fh)',fontSize:20,letterSpacing:1,color:'var(--t)')}>📡 KPI ENGINE</span>
+          <span style={{fontFamily:'var(--fh)',fontSize:20,letterSpacing:1,color:'var(--t)'}}>📡 KPI ENGINE</span>
         </div>
 
         <div className="kpi-total">
