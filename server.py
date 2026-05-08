@@ -65,6 +65,7 @@ class Handler(SimpleHTTPRequestHandler):
         try:
             with urllib.request.urlopen(req) as resp:
                 data = resp.read()
+            print(f"  ✓ Anthropic 200 — {len(data)} bytes")
             self.send_response(200)
             self._cors()
             self.send_header("Content-Type", "application/json")
@@ -72,12 +73,14 @@ class Handler(SimpleHTTPRequestHandler):
             self.wfile.write(data)
         except urllib.error.HTTPError as e:
             data = e.read()
+            print(f"  ✗ Anthropic {e.code}: {data[:300]}")
             self.send_response(e.code)
             self._cors()
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(data)
         except Exception as e:
+            print(f"  ✗ Proxy error: {e}")
             self._json_error(500, str(e))
 
     def _cors(self):

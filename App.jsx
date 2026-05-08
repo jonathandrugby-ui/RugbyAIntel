@@ -602,13 +602,21 @@ function RIS() {
   const O=f=>v=>setOpp(o=>({...o,[f]:v}));
 
   const callAPI = async(system,messages,maxT=2000) => {
-    const res=await fetch('/api/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:maxT,system,messages})
-    });
-    const d=await res.json();
-    if(d.error) throw new Error(d.error.message);
-    if(!d.content?.[0]) throw new Error('No response.');
+    let res;
+    try{
+      res=await fetch('/api/messages',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:maxT,system,messages})
+      });
+    }catch(netErr){
+      throw new Error(`Cannot reach server — is it running? (${netErr.message})`);
+    }
+    const text=await res.text();
+    let d;
+    try{ d=JSON.parse(text); }
+    catch{ throw new Error(`Server returned non-JSON (HTTP ${res.status}): ${text.slice(0,200)}`); }
+    if(d.error) throw new Error(d.error.message||JSON.stringify(d.error));
+    if(!d.content?.[0]) throw new Error(`Unexpected API response: ${text.slice(0,200)}`);
     return d.content[0].text;
   };
 
