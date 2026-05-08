@@ -473,7 +473,8 @@ const buildModulePrompt = (moduleId,level,dataTypes,deepMode,soulDoc) => {
   const dc=dataTypes.length>0?dataTypes.join(', '):'manual input';
   const soul=soulDoc?`\n\nTEAM SOUL CONTEXT:\n${soulDoc.slice(0,700)}\n`:'';
   const depth=deepMode?'\n\nDEPTH MODE: Be exhaustive. Quantify everything. Flag every gap with a specific action.':'';
-  const skillCtx=`\n\nSKILL TAXONOMY REFERENCE:\n${skillTaxonomyText()}`;
+  // Abbreviated taxonomy keeps prompts lean enough for Lambda's 30s timeout
+  const skillCtx=`\n\nSKILL TAXONOMY (key categories): Ball Skills: passing, receiving, kicking. Contact: tackling, breakdown, evasion. Set Piece: scrummaging, lineout, restarts. Use the World Rugby skill taxonomy for all assessments.`;
   const condCtx=`\n\nELITE CONDITIONING BASELINES:\n${conditioningText()}`;
 
   const base={
@@ -625,7 +626,7 @@ function RIS() {
     try{
       const txt=await callAPI(
         'You are a Rugby Intelligence Strategist. Build precise, honest, specific Soul Documents. No clichés.',
-        [{role:'user',content:buildSoulPrompt(team,season,opp)}],1800
+        [{role:'user',content:buildSoulPrompt(team,season,opp)}],1200
       );
       setSoulDoc(txt);setSoulStep('done');
     }catch(e){setError(e.message||'Connection failed.');}
@@ -648,7 +649,7 @@ function RIS() {
     try{
       const sys=buildModulePrompt(selMod.id,selLevel,selData,deepMode,soulDoc);
       const msgs=[{role:'user',content:input}];
-      const txt=await callAPI(sys,msgs,deepMode?3500:2000);
+      const txt=await callAPI(sys,msgs,deepMode?1800:1400);
       setHistory([{role:'user',content:input},{role:'assistant',content:txt}]);
       setResult(txt);setAnalyseStep('result');
     }catch(e){setError(e.message||'Connection failed.');}
@@ -661,7 +662,7 @@ function RIS() {
     const nh=[...history,{role:'user',content:followUp}];
     try{
       const sys=buildModulePrompt(selMod.id,selLevel,selData,deepMode,soulDoc);
-      const txt=await callAPI(sys,nh,2000);
+      const txt=await callAPI(sys,nh,1200);
       setHistory([...nh,{role:'assistant',content:txt}]);
       setResult(txt);setFollowUp('');
     }catch(e){setError(e.message||'Connection failed.');}
@@ -679,7 +680,7 @@ function RIS() {
     try{
       const txt=await callAPI(
         'You are a Rugby Coaching Document Designer. Generate structured, immediately usable coaching templates specific to the team provided, not generic.',
-        [{role:'user',content:buildTemplatePrompt(type,soulDoc,team.name)}],2500
+        [{role:'user',content:buildTemplatePrompt(type,soulDoc,team.name)}],1000
       );
       setTemplateResult(txt);setExpView('template');
     }catch(e){setError(e.message||'Connection failed.');}
@@ -697,7 +698,7 @@ function RIS() {
     setLoading(true);setLoadAmber(false);setLoadMsg('BUILDING PLAN');setError('');
     try{
       const sys=buildModulePrompt('skillanalysis',selLevel,[],false,soulDoc);
-      const txt=await callAPI(sys,[{role:'user',content:input}],2000);
+      const txt=await callAPI(sys,[{role:'user',content:input}],1400);
       setResult(txt);setSelMod(MODULES.find(m=>m.id==='skillanalysis'));setAnalyseStep('result');setView('analyse');
     }catch(e){setError(e.message||'Connection failed.');}
     finally{setLoading(false);}
