@@ -465,7 +465,7 @@ const conditioningText = () =>
 const buildSoulPrompt = (team,season,opp) => {
   let p=`You are a Rugby Intelligence Strategist. Build the Soul Document for ${team.name} — their strategic DNA for this campaign.\n\nTEAM: ${team.name} | ${team.level}\nPlaying Style: ${team.styles.join(', ')||'Not specified'}\nPhysical: ${team.physical.join(', ')||'Not specified'}\nScrum: ${team.scrum} | Lineout: ${team.lineout}\nMental: ${team.mental.join(', ')||'Not specified'}\nNon-Negotiables: ${team.nonNeg||'Not provided'}\nWeaknesses: ${team.weaknesses||'Not provided'}\n\nSEASON: ${season.objective||'Not specified'} | ${season.competition||'Not specified'}\nKey Dates: ${season.keyDates||'Not specified'}\nTraining: ${season.training||'Not specified'}\nGrowth Need: ${season.growth||'Not specified'} | Depth: ${season.depth||'Not specified'}`;
   if(opp?.name) p+=`\n\nOPPOSITION: ${opp.name}\nSoul: ${opp.soul||'Not described'}\nDefence: ${opp.defence||'Unknown'}\nSet Piece: ${opp.setPiece||'Unknown'}\nThreats: ${opp.threats||'Not provided'}\nPressure Points: ${opp.pressure||'Not provided'}\nConditions: ${opp.conditions||'Standard'}`;
-  p+=`\n\nGenerate with these exact section headers:\n## TEAM SOUL\nWho ${team.name} actually are right now. Honest. Specific.\n## SEASON IDENTITY\nThe gap between current and target state. The central strategic challenge.\n${opp?.name?`## OPPOSITION EXPLOIT MAP\nWhere ${team.name}'s strengths meet ${opp.name}'s vulnerabilities.\n`:''}## CAMPAIGN PRINCIPLES\n3 to 5 non-negotiable identity commitments.\n## FIRST PRIORITY\nThe single most important thing to address in the next 4 weeks.\n\nBe direct. Specific. No clichés.`;
+  p+=`\n\nGenerate with these exact section headers:\n## TEAM SOUL\nWho ${team.name} actually are right now. Honest. Specific. What they do, depend on, and how they break. 3-5 sentences.\n## SEASON IDENTITY\nThe gap between current and target state. The central strategic challenge of this campaign.\n${opp?.name?`## OPPOSITION EXPLOIT MAP\nThe exact intersection between ${team.name}'s strengths and ${opp.name}'s vulnerabilities. Where one soul breaks.\n`:''}## CAMPAIGN PRINCIPLES\n3 to 5 non-negotiable identity commitments governing every decision this season.\n## FIRST PRIORITY\nThe single most important thing ${team.name} must address in the next 4 weeks. One thing only.\n\nBe direct. Specific. No clichés. No generic rugby language.`;
   return p;
 };
 
@@ -1415,6 +1415,7 @@ function RIS() {
           <div className="hdr-right">
             <div className="dot"/>
             {soulDoc?<span style={{color:'var(--amber)',fontSize:9,marginLeft:4}}>{team.name?.toUpperCase()}</span>:<span>LIVE</span>}
+            <a href="/prompts.html" style={{fontFamily:'var(--fm)',fontSize:8,color:'var(--t3)',textDecoration:'none',marginLeft:10,border:'1px solid var(--b)',padding:'2px 6px',borderRadius:3,letterSpacing:'1px'}} title="Prompt Library">PROMPTS</a>
           </div>
         </div>
 
