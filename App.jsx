@@ -351,6 +351,31 @@ select.inp{cursor:pointer;appearance:none}
 .risk-flag.med{background:var(--ad);border:1px solid var(--ba);color:var(--amber)}
 .risk-flag.ok{background:var(--gd);border:1px solid var(--bg2);color:var(--green)}
 
+/* PROMPT LIBRARY */
+.pl-search{width:100%;background:var(--card);border:1px solid var(--b);border-radius:6px;padding:9px 12px 9px 36px;font-family:var(--fb);font-size:13px;color:var(--t);outline:none;transition:border-color .15s;margin-bottom:14px}
+.pl-search:focus{border-color:var(--bg2)}
+.pl-search::placeholder{color:var(--t3)}
+.pl-search-wrap{position:relative}
+.pl-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--t3);pointer-events:none}
+.pl-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.pl-card{background:var(--card);border:1px solid var(--b);border-radius:8px;margin-bottom:8px;overflow:hidden;transition:border-color .15s}
+.pl-card:hover{border-color:var(--t3)}
+.pl-hdr{padding:12px 14px;display:flex;align-items:flex-start;justify-content:space-between;cursor:pointer;gap:12px}
+.pl-meta{flex:1;min-width:0}
+.pl-title{font-family:var(--fh);font-size:16px;letter-spacing:.5px;color:var(--t);margin-bottom:2px}
+.pl-desc{font-size:11px;color:var(--t2);line-height:1.5}
+.pl-tags{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.pl-tag{font-family:var(--fm);font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid var(--b);color:var(--t3);letter-spacing:.5px}
+.pl-tag.g{border-color:#00c44a30;color:var(--green);background:var(--gd)}
+.pl-tag.a{border-color:#c9960c30;color:var(--amber);background:var(--ad)}
+.pl-acts{display:flex;align-items:center;gap:6px;flex-shrink:0;padding-top:2px}
+.pl-body{border-top:1px solid var(--b);padding:14px;background:#060e08}
+.pl-text{font-family:var(--fm);font-size:11px;line-height:1.8;color:#6b8e72;white-space:pre-wrap;word-break:break-word}
+.pl-stat{background:var(--card);border:1px solid var(--b);border-radius:6px;padding:8px 14px;display:flex;align-items:baseline;gap:6px}
+.pl-stat-n{font-family:var(--fh);font-size:24px;color:var(--green)}
+.pl-stat-l{font-size:11px;color:var(--t3)}
+.pl-stats-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+
 @media(max-width:400px){.mod-grid,.data-grid,.quick-grid,.eff-grid{grid-template-columns:1fr}}
 `;
 
@@ -392,6 +417,387 @@ const TEMPLATES = [
   {id:'matchreport',label:'Match Report Template',desc:'Post-match analysis format for coaching staff'},
   {id:'conditioning',label:'Peak Performance Cycle',desc:'4-week conditioning programme vs elite baseline'},
 ];
+const PROMPT_CATS = [
+  {id:'all',label:'All'},
+  {id:'foundation',label:'Foundation'},
+  {id:'modules',label:'Modules'},
+  {id:'data',label:'Data Integration'},
+  {id:'extensions',label:'Extensions'},
+];
+
+const PROMPTS = [
+  {id:'arch',cat:'foundation',type:'build',title:'Core Architecture',
+   desc:'Full RIS system structure, module routing, API pattern, and state management',
+   tags:['React','Architecture','Claude API'],
+   text:`Act as a Senior Software Architect specialising in sports performance analytics. I am building a Rugby Intelligence System (RIS) using React for the frontend and Claude's API for AI-powered analysis.
+
+Define the complete modular architecture for this system. It needs to:
+
+1. Support 8 analysis modules: Game Plan Developer, Player Developer, Season Constructor, Coach the Coach, Coach the Player, Game Analysis, Tactics and Positions, Red Zone Audit
+
+2. Handle 4 input types that can be combined: GPS and wearable data, video analysis output, manual statistics, combined multi-source
+
+3. Work across 5 rugby levels: Elite Professional, Semi-Professional, Academy, Youth and Age Grade, Community
+
+4. Call Claude's API with dynamically generated system prompts based on the user's selections
+
+Output the complete React component file structure, the API call pattern, the state management approach, and the system prompt generation logic. Include comments explaining every architectural decision. Use UK English.`},
+
+  {id:'player-schema',cat:'foundation',type:'build',title:'Player Data Schema',
+   desc:'Complete JavaScript schema for a player profile including position-specific primary value metrics for all 15 positions',
+   tags:['Data Schema','JavaScript'],
+   text:`Act as a Sports Data Architect. I am building a Rugby Intelligence System and need a comprehensive player data schema.
+
+Build a JavaScript data structure for a rugby player profile that includes:
+
+1. Identity fields: name, date of birth, position number (1 to 15), position name, playing level, current club, nationality
+
+2. Physical metrics: height in cm, weight in kg, body fat percentage, squat to bodyweight ratio, 10m sprint time in seconds, 40m sprint time in seconds, VO2 max estimate
+
+3. Position-specific primary value metrics for all 15 positions:
+   - Loosehead Prop (1): scrum stability percentage, lineout lift accuracy
+   - Hooker (2): lineout throw accuracy, ruck arrival time post-tackle
+   - Tighthead Prop (3): scrum pressure output, turnover rate at breakdown
+   - Lock (4 and 5): lineout catch percentage, dominant carry rate
+   - Blindside Flanker (6): ruck clearance speed, tackle completion under fatigue
+   - Openside Flanker (7): turnover rate, ruck arrival time
+   - Number 8: gain line carry metres, pick and drive conversion
+   - Scrum Half (9): ruck clearance latency in seconds, box kick accuracy
+   - Fly Half (10): territory kick efficiency, defensive line speed rating
+   - Centres (12, 13): dominant carry percentage, defensive intercept rate
+   - Wingers (11, 14): try assist conversion, kick chase completion
+   - Fullback (15): counter-attack success rate, aerial claim percentage
+
+4. Performance history array and development flags
+
+Output as a clean JavaScript object with realistic example data for a Tighthead Prop. Include JSDoc comments. Use UK English.`},
+
+  {id:'match-schema',cat:'foundation',type:'build',title:'Match Event Schema',
+   desc:'Tracks every discrete collision event with spatial, temporal, possession, and outcome data. Includes xP calculator function',
+   tags:['Data Schema','JavaScript','xP'],
+   text:`Act as a Sports Data Engineer. I am building a Rugby Intelligence System that treats every phase of play as a discrete data event.
+
+Build a JavaScript schema for a MatchEvent object that captures:
+
+1. Spatial data: X coordinate (0 to 100, pitch width), Y coordinate (0 to 68, pitch length), territory zone (own 22, own half, opposition half, red zone)
+
+2. Temporal data: match minute, phase number within sequence, cumulative fatigue index
+
+3. Possession data: team in possession, ruck speed in seconds, ball carrier position number
+
+4. Outcome data: gain line result, turnover occurred, penalty conceded, try scored
+
+5. Set piece data: event type, set piece outcome if applicable
+
+Also build a calculateXP function that:
+- Takes field zone and rugby level as parameters
+- Returns Expected Points value: Elite = 4.2 red zone, 2.1 opposition half, 0.8 own half
+- Scales by level: Semi-Pro 0.85, Academy 0.70, Youth 0.55, Community 0.45
+- Returns the xP value plus three decision options with expected outcomes
+
+Output clean JavaScript with JSDoc comments. Use UK English.`},
+
+  {id:'season-schema',cat:'foundation',type:'build',title:'Season and Squad Schema',
+   desc:'Full data structures for squad management, fixture planning, periodisation phases, and Squad Attrition Probability',
+   tags:['Data Schema','JavaScript','Load Management'],
+   text:`Act as a Rugby Performance Scientist. I am building a Season Constructor module for a Rugby Intelligence System.
+
+Build JavaScript data structures for:
+
+1. A Squad object: array of player profiles, starters by position, 6-2 bench rotation plan, injury tracking, load history per player
+
+2. A Fixture object: date, opposition, competition type, home or away, travel distance, match intensity (1-10), predicted load score
+
+3. A Season object: fixture array, periodisation phases, Squad Attrition Probability per week, peak performance target weeks
+
+4. A WeeklyLoadReport: flags weeks where squad load exceeds threshold, 3+ players have fatigue above 80%, travel plus density creates high injury risk
+
+Also build calculateAttritionProbability that:
+- Takes 4 consecutive fixtures as input
+- Returns risk percentage based on intensity and travel load
+- Flags: Low Risk below 15%, Medium 15-30%, High above 30%
+
+Output clean JavaScript with example data for a 30-week season. Use UK English.`},
+
+  {id:'gameplan',cat:'modules',type:'module',title:'Game Plan Developer',
+   desc:'Structured opposition data form. Returns xP scenarios, pod recommendations, and set piece exploitation plan',
+   tags:['React Component','Tactics','xP'],
+   text:`I am building a Rugby Intelligence System in React. Build a complete React component called GamePlanDeveloper.
+
+Form fields:
+- Opposition team name, scrum win %, average ruck speed (seconds), defensive system (Blitz/Fold/Rush/Hybrid), lineout accuracy %, key player threats, your team's strengths, rugby level
+
+Call Claude's API (max_tokens 2000) with this system prompt, replacing [level]:
+
+"You are a Tactical Performance Director for a [level] rugby team. Generate evidence-based, specific game plans. Generic coaching advice is unacceptable. Identify the three most exploitable defensive patterns, calculate Expected Points scenarios for red zone options (posts, corner, tap and go), recommend pod formations (1-3-2-2 or 2-4-2) that exploit specific defensive gaps, define a ruck speed protocol targeting the 3-second threshold, and flag scrum and lineout vulnerabilities. Headers: ## Territory Strategy, ## Set Piece Exploitation, ## Attack Shape and Pods, ## Defensive Counter-Plan, ## Priority Actions."
+
+Parse the response by splitting on ## headers and display each section as a styled card.
+
+Include a Deep Analysis toggle that sets max_tokens to 4000 and appends: "Be exhaustive. Quantify everything. Flag every gap."`},
+
+  {id:'playerdev',cat:'modules',type:'module',title:'Player Developer',
+   desc:'Position-aware input form. Generates 12-week technical programme, deficit analysis, wildcard intervention, and milestone targets',
+   tags:['React Component','LTAD','Biomechanics'],
+   text:`I am building a Rugby Intelligence System in React. Build a React component called PlayerDeveloper.
+
+Form fields: player name, position number (1-15), age, playing level, weight, squat-to-bodyweight ratio, 10m and 40m sprint times, tackle completion %, dominant carry %, GPS summary, video observations and known technical issues.
+
+When a position number is selected, automatically display the Primary Value Metrics for that position.
+
+System prompt for Claude, replacing [level] and [position]:
+
+"You are a High Performance Lead for a [level] rugby programme. Create precise, individualised player evolution maps. Generic training programmes are unacceptable. For the [position] data: map metrics against the gold standard for their level, calculate deficit across the three primary value metrics, generate a 12-week technical programme targeting collision mechanics, include one Wildcard intervention (wrestling, gymnastics, vision training), set measurable milestones at weeks 4, 8, and 12. Every recommendation must link to a specific metric. Headers: ## Current Performance Profile, ## Deficit Analysis, ## 12-Week Programme, ## Wildcard Protocol, ## Review Milestones."`},
+
+  {id:'season',cat:'modules',type:'module',title:'Season Constructor',
+   desc:'Fixture input with calendar grid. Calculates Squad Attrition Probability. Generates peaking protocol and 6-2 rotation plan',
+   tags:['React Component','Periodisation','Load Management'],
+   text:`I am building a Rugby Intelligence System in React. Build a React component called SeasonConstructor.
+
+Component structure:
+1. Season start and end dates
+2. Squad size
+3. Fixture builder: add up to 40 fixtures with date, opposition, home/away, competition type, travel time. Display in a sortable table.
+4. Mark up to 3 peak performance target dates
+5. Rugby level selector
+
+After input, display a 30-week calendar grid: Week Number, Fixture, Load Score, Risk Level. Colour code risk: green below 15%, amber 15-30%, red above 30%.
+
+System prompt for Claude, replacing [level]:
+
+"You are a Season Architect for a [level] rugby programme. Build loading, peaking, and recovery phases across the season, calculate Squad Attrition Probability for high-density periods, design a 6-2 bench rotation to protect the forward pack, flag every high-risk week with specific reasoning, and build a Peaking Protocol for the 3 weeks before each marked peak date. Headers: ## Season Phase Map, ## High Risk Week Flags, ## Bench Rotation Schedule, ## Peaking Protocol, ## Load Management Principles."`},
+
+  {id:'coachcoach',cat:'modules',type:'module',title:'Coach the Coach',
+   desc:'Decision audit against match data. Names the cognitive bias. Delivers unfiltered data-driven verdict: JUSTIFIED, QUESTIONABLE, or UNSUPPORTED',
+   tags:['React Component','Decision Audit','Bias'],
+   text:`I am building a Rugby Intelligence System in React. Build a React component called CoachAudit.
+
+Inputs:
+1. What decision was made (required)
+2. Coach's stated reasoning at the time (required)
+3. Match situation: scoreline, match minute, territory zone
+4. What happened in the 10-20 minutes after
+5. Performance data after: territory change %, key metric change (optional)
+6. Rugby level
+
+System prompt, replacing [level]:
+
+"You are a Brutally Honest Strategic Advisor auditing decisions for a [level] rugby programme. Cross-reference every stated reason against actual outcome data. Name the specific cognitive bias: confirmation bias, recency bias, sunk cost fallacy, authority bias, availability heuristic, or in-group bias. Provide the data-driven alternative decision. Deliver a clear verdict — JUSTIFIED, QUESTIONABLE, or UNSUPPORTED — at the start of your verdict section. Be direct. Use data not opinion. Do not soften findings. Headers: ## Decision Audit, ## Data Verdict, ## Bias Identified, ## Alternative Decision, ## One Priority Change."
+
+Display a large verdict badge at the top of results: green for JUSTIFIED, amber for QUESTIONABLE, red for UNSUPPORTED.`},
+
+  {id:'coachplayer',cat:'modules',type:'module',title:'Coach the Player',
+   desc:'Direct first-person coaching output addressed to the player. Every piece of feedback tied to specific data. No generic language',
+   tags:['React Component','Technical Coaching','Individual'],
+   text:`I am building a Rugby Intelligence System in React. Build a React component called PlayerCoach.
+
+Inputs: player name, position, age, playing level, recent match performance metrics (minutes, carries, tackles, errors, GPS collisions), up to 5 video analysis observations with category dropdowns, physical test results, what the player believes about their own performance, previous interventions tried.
+
+System prompt, replacing [level]:
+
+"You are a Technical Performance Coach speaking directly to a [level] rugby player. Identify the three highest-priority technical deficits. For each deficit explain exactly why it limits performance using biomechanical or tactical reasoning tied to specific data points. Prescribe specific drills and technical cues. Set measurable targets with timeframes. Flag any deeper constraints needing specialist input. Speak directly to the player in second person. Plain language only. No generic coaching speak. Headers: ## Your Performance Profile, ## The 3 Things Holding You Back, ## What You Need to Do, ## Your Targets, ## Watch Points."`},
+
+  {id:'gameanalysis',cat:'modules',type:'module',title:'Game Analysis',
+   desc:'Match diagnosis not summary. Decisive structural moments, territory efficiency vs xP benchmark, gain line battle turning points',
+   tags:['React Component','Match Analysis','xP'],
+   text:`I am building a Rugby Intelligence System in React. Build a React component called MatchAnalyser.
+
+Inputs: match details, territory/possession % sliders, set piece data, ruck data (average speed, % under 3s), scoring with minutes, GPS summary (optional), coach observations, rugby level.
+
+System prompt, replacing [level]:
+
+"You are a Match Intelligence Analyst for a [level] rugby team. Diagnose this match — do not summarise it. Find the structural causes of the outcome. Identify the three decisive moments that structurally determined the result. Analyse territory efficiency: calculate actual points per 22m entry versus the xP benchmark for this level. Evaluate ruck speed impact on defensive line reset. Identify who won the gain line battle and at what minute the tide turned. Deliver a clear structural verdict. Every finding must have a cause and effect explanation. No data without diagnosis. Headers: ## Match Verdict, ## Three Decisive Moments, ## Territory Efficiency Report, ## Set Piece Impact, ## Three Priority Actions."
+
+Display the Match Verdict in a highlighted box at the top of results.`},
+
+  {id:'tactics',cat:'modules',type:'module',title:'Tactics and Positions',
+   desc:'Interactive formation for positions 1-15. Position-aware input fields and benchmarks. Connects individual performance to team system',
+   tags:['React Component','Positions 1-15','Tactical Analysis'],
+   text:`I am building a Rugby Intelligence System in React. Build a React component called PositionalAnalysis.
+
+1. A visual rugby formation diagram in CSS — numbered circles for positions 1-15 in rough formation shape. Clicking a number selects that position.
+
+2. When a position is selected, show position-specific input fields for its Primary Value Metric:
+   - 1: scrum stability %, lineout lift accuracy | 2: lineout throw accuracy, ruck arrival time
+   - 3: scrum pressure rating, turnover rate | 4-5: lineout catch %, dominant carry rate
+   - 6: ruck clearance speed, tackle completion | 7: turnover rate, ruck arrival time
+   - 8: gain line carry metres, pick and drive conversion | 9: ruck clearance latency, box kick accuracy
+   - 10: territory kick efficiency, defensive line speed | 12-13: dominant carry %, intercept rate
+   - 11-14: try assist conversion, kick chase completion | 15: counter-attack success, aerial claim %
+
+3. Video observations text area and rugby level selector
+
+System prompt instructs Claude to: name the position's Primary Value Metric, compare against the gold standard for that level, identify the specific deficit, prescribe 3 technical adjustments, connect to team system impact. Headers: ## Position Profile, ## Performance vs Gold Standard, ## Deficit Analysis, ## Three Adjustments, ## System Impact.`},
+
+  {id:'redzone',cat:'modules',type:'module',title:'Red Zone Audit',
+   desc:'xP calculator with entry log. Index score against level benchmark. Audits decision quality per entry and flags systemic bias',
+   tags:['React Component','xP','Territory'],
+   text:`I am building a Rugby Intelligence System in React. Build a React component called RedZoneAudit.
+
+Inputs: number of 22m entries, points scored, entry log (up to 12 entries: minute, decision — Kick for Posts/Kick to Corner/Tap and Go/Scrum/Lineout, outcome — Points Scored/Turnover/No Score/Penalty Against), kicking data (50/22, box kicks), rugby level.
+
+Level xP benchmarks: Elite = 4.2, Semi-Pro = 3.6, Academy = 3.0, Youth = 2.4, Community = 2.0.
+
+Display before AI analysis: Actual xP (points ÷ entries), Index Score (actual ÷ benchmark × 100) as a large number — green above 100, amber 75-100, red below 75.
+
+System prompt, replacing [level]:
+
+"You are a Red Zone Efficiency Analyst for a [level] rugby team. Analyse whether scoring zone entries are converting at a rate that justifies the territory strategy. Calculate the efficiency score, identify under-indexing patterns, evaluate each decision type for probability optimisation, assess kicking strategy, and rank priority adjustments by impact. Headers: ## Territory Efficiency Score, ## xP Analysis, ## Decision Quality Audit, ## Kicking Strategy, ## Priority Adjustments."`},
+
+  {id:'gps-parser',cat:'data',type:'data',title:'GPS Data Parser',
+   desc:'Normalises raw GPS exports from Catapult, STATSports, or Polar into a standardised RIS schema. Includes FatigueIndex calculator',
+   tags:['JavaScript','GPS','Data Integration'],
+   text:`I am building a Rugby Intelligence System. Build a JavaScript utility called parseGPSData.
+
+Takes raw GPS export data (CSV or JSON from Catapult, STATSports, or Polar) and converts it to a standardised format.
+
+Map these metrics to a consistent schema:
+- Total Distance (metres), High Speed Running Distance (above 5.5 m/s), Sprint Distance (above 7.0 m/s), Maximum Velocity (m/s), Acceleration Load (PlayerLoad or equivalent), Impact count above 5g → CollisionCount, Heart Rate Average and Maximum
+
+The function must:
+1. Accept CSV string or JavaScript object
+2. Identify the GPS system from column header names
+3. Return a standardised GPSSummary object regardless of source
+4. Flag missing critical fields in a warnings array
+5. Calculate a FatigueIndex (0-100) from: high speed running (weight 0.4), collision count (weight 0.4), session duration (weight 0.2)
+
+Also build formatForClaudePrompt that converts GPSSummary into a clean labelled text block ready to paste into a Claude API message. Include error handling and a parseCSVString helper. Use UK English.`},
+
+  {id:'video-input',cat:'data',type:'data',title:'Video Analysis Input',
+   desc:'Structured observation entry for set piece, breakdown, defensive system, attack patterns, and player flags. Exports as Claude-ready text block',
+   tags:['React Component','Video Analysis','Observations'],
+   text:`I am building a Rugby Intelligence System in React. Build a React component called VideoAnalysisInput.
+
+Collapsible sections:
+
+1. Set Piece — Scrum: up to 5 observations; Lineout: up to 5 observations on calls, timing, accuracy
+
+2. Breakdown and Ruck — up to 8 observations each with: phase number (optional), position involved (1-15), observation type (Slow Ball/Turnover Risk/Dominant Cleanout/Penalty Risk/Jackaling Threat), specific note
+
+3. Defensive System — shape identified (Blitz/Fold/Rush/Hybrid/Uncertain), up to 5 observations on line speed, communication gaps, edge defence
+
+4. Attack Patterns — up to 5 observations on pod alignment, ball carrier selection, kicking tendencies
+
+5. Individual Player Flags — up to 8 flags with: position number, observation text, flag type (Positive/Needs Work/Urgent/Injury Concern)
+
+A Format for Analysis button converts all observations into a structured text block optimised for Claude to parse.`},
+
+  {id:'manual-stats',cat:'data',type:'data',title:'Manual Stats Input Builder',
+   desc:'Standardised stat entry form that formats data correctly for any RIS module. Validates inputs and flags gaps before analysis',
+   tags:['React Component','Statistics','Data Entry'],
+   text:`I am building a Rugby Intelligence System in React. Build a React component called ManualStatsInput with two modes:
+
+MATCH STATS MODE:
+- Basic: date, teams, score, competition, home or away
+- Possession and territory: percentage sliders
+- Set piece: scrums won/lost/penalised, lineout accuracy (own and opposition)
+- Breakdown: ruck count, rucks won, average ruck speed, % under 3 seconds
+- Scoring: tries with minutes, penalties, conversions, missed kicks
+- GPS summary (optional): distance, high-speed running, collisions
+
+PLAYER STATS MODE:
+- Identity: name, position, level, age
+- Match involvement: minutes, carries, metres, dominant carries, offloads, turnovers won, tackles made and missed, errors
+- GPS: distance, high-speed running, collision count
+
+Validate all inputs: flag missing required fields and values outside realistic ranges. Show a validation summary before submission.
+
+A Format for Analysis button converts the completed form into a structured text block optimised for Claude to parse.`},
+
+  {id:'storage',cat:'extensions',type:'extend',title:'Squad and Analysis Storage',
+   desc:'localStorage-based squad roster and analysis history. Custom hooks, import/export as JSON, and roster display component',
+   tags:['React Hook','localStorage','Squad Management'],
+   text:`I am building a Rugby Intelligence System in React. Build a data persistence layer using localStorage.
+
+Create two custom React hooks:
+
+useSquad:
+- savePlayer(playerData): saves or updates by name and position
+- getPlayer(name): retrieves a player profile
+- getAllPlayers(): returns full squad sorted by position number
+- deletePlayer(name): removes a player
+- exportSquad(): returns squad as JSON string for download
+- importSquad(jsonString): replaces current squad with imported data
+
+useAnalysisHistory:
+- saveAnalysis(module, level, input, output): saves with timestamp and auto-generated ID
+- getHistory(): returns all analyses sorted by date descending
+- getHistoryByModule(moduleId): filters by module type
+- deleteAnalysis(id): removes an entry
+- exportAnalysis(id): returns a formatted plain text version for download
+
+Also build SquadRoster component: table of all players sorted by position, with Load/Edit/Delete buttons per row, Import/Export JSON buttons, and search bar filtering by name or position.`},
+
+  {id:'xp-calc',cat:'extensions',type:'extend',title:'xP Calculator',
+   desc:'Standalone Expected Points calculator for any field position. Quick Decision mode for real-time recommendations. Decision log with outcome tracking',
+   tags:['React Component','xP','Real-Time'],
+   text:`I am building a Rugby Intelligence System in React. Build a standalone Expected Points calculator called xPCalculator.
+
+Benchmarks: Elite red zone = 4.2, opposition half = 2.1, own half = 0.8. Scale by level: Semi-Pro ×0.85, Academy ×0.70, Youth ×0.55, Community ×0.45.
+
+Two modes:
+
+CALCULATOR MODE:
+- Field position slider (0-100 in 5m bands) with zone label
+- Game situation: Normal, Leading 7+, Trailing 7+, Final 10 mins, Final 3 mins
+- Rugby level selector
+- For each available option: Expected Points value, Risk rating (Low/Medium/High), colour-coded recommendation, one-sentence rationale
+
+QUICK DECISION MODE:
+- Scoreline, match minute, field position slider, rugby level
+- Output: single recommended decision with one-line justification and xP value
+
+Match Decision Log: record each decision with minute, position, decision taken, xP of optimal decision, actual outcome. Show total xP of decisions made vs optimal as a Decision Quality Score %.`},
+
+  {id:'export',cat:'extensions',type:'extend',title:'Analysis Export',
+   desc:'Converts any RIS analysis to a formatted .txt or .md report. Header, sections, footer with generation timestamp',
+   tags:['JavaScript','Export','Reporting'],
+   text:`I am building a Rugby Intelligence System in React. Build an export utility called exportAnalysis.
+
+Functions:
+
+formatAsText(analysisData): clean plain text report with:
+- Header block: module name, date, rugby level, data types used
+- Section headings in uppercase with a line of dashes beneath
+- Footer: "Generated by Rugby Intelligence System" with timestamp
+
+formatAsMarkdown(analysisData): same structure using markdown (## headers, proper line breaks)
+
+downloadFile(content, filename, type): triggers browser file download ('txt' or 'md')
+
+generateFilename(module, level, date): returns e.g. "GamePlan_ElitePro_2025-01-15.txt"
+
+ShareButton React component:
+- Takes analysis object as prop
+- Download as Text and Download as Markdown buttons
+- Copy to Clipboard button
+- Character count and estimated reading time
+
+Reports must be clean and professional enough to share directly with coaching staff.`},
+
+  {id:'benchmark-db',cat:'extensions',type:'extend',title:'Position Benchmark Database',
+   desc:'Gold standard performance metrics for all 15 positions across all 5 rugby levels. Comparison functions and deficit calculators',
+   tags:['JavaScript','Benchmarks','Positions 1-15'],
+   text:`I am building a Rugby Intelligence System. Build a position benchmark database called positionBenchmarks.
+
+Static reference database: benchmarks[positionNumber][level] = { metrics object }.
+
+Example — Position 3 (Tighthead Prop) at Elite Professional:
+- scrumWinRate: 72%, scrumPressureRating: 8.2/10, turnoverRateAtBreakdown: 4.1/match
+- dominantCarryRate: 58%, ruck arrival: 3.2s, tackleCompletion: 88%
+
+Example — Position 9 (Scrum Half) at Elite Professional:
+- ruckClearanceLatency: 2.4s, boxKickAccuracy: 71%, passingAccuracy: 94%, distributionSpeed: 1.1s
+
+Build realistic values for all 15 positions at all 5 levels. Values should decrease proportionally from Elite to Community.
+
+Functions:
+- getDeficit(positionNumber, level, playerMetrics): returns deficit % per metric
+- getTopDeficit(positionNumber, level, playerMetrics): returns the single biggest gap
+- formatForClaudePrompt(positionNumber, level, playerMetrics): returns a text block for use in a Claude API call
+
+Use UK English.`},
+];
+
 const PLACEHOLDERS = {
   gameplan:'Opposition data:\n- Scrum win %\n- Ruck speed averages\n- Defensive system (blitz/fold/rush)\n- Kicking patterns\n- Lineout accuracy\n- Key player tendencies\n- Your squad strengths',
   playerdev:'Player data:\n- Name, position, age, level\n- Physical metrics (weight, sprint times)\n- Tackle completion, dominant carry %\n- GPS data (distance, collisions)\n- Known weaknesses and injury history',
@@ -590,6 +996,12 @@ function RIS() {
   const [newPlayerName,setNewPlayerName] = useState('');
   const [newPlayerPos,setNewPlayerPos] = useState(10);
   const [skillsView,setSkillsView] = useState('list');
+
+  // Prompt Library
+  const [promptCat,setPromptCat] = useState('all');
+  const [promptSearch,setPromptSearch] = useState('');
+  const [promptOpen,setPromptOpen] = useState({});
+  const [promptCopied,setPromptCopied] = useState({});
 
   // Exports
   const [saved,setSaved] = useState([]);
@@ -1392,6 +1804,90 @@ function RIS() {
     );
   };
 
+  // ─── PROMPT LIBRARY ───────────────────────────────────────────────────────
+
+  const renderPrompts = () => {
+    const TYPE_COLOR = {build:'g',module:'g',data:'a',extend:'a'};
+    const filtered = PROMPTS.filter(p=>{
+      const matchCat = promptCat==='all'||p.cat===promptCat;
+      const q = promptSearch.toLowerCase();
+      const matchSearch = !q||p.title.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q)||p.tags.some(t=>t.toLowerCase().includes(q));
+      return matchCat&&matchSearch;
+    });
+    const CAT_LABELS = {foundation:'Foundation & Architecture',modules:'Analysis Module Builds',data:'Data Integration',extensions:'Extensions & Utilities'};
+    const groups = ['foundation','modules','data','extensions'].map(cat=>({cat,label:CAT_LABELS[cat],items:filtered.filter(p=>p.cat===cat)})).filter(g=>g.items.length>0);
+
+    const copyPrompt = (p) => {
+      navigator.clipboard.writeText(p.text);
+      setPromptCopied(s=>({...s,[p.id]:true}));
+      setTimeout(()=>setPromptCopied(s=>({...s,[p.id]:false})),2000);
+    };
+
+    return(
+      <div className="section">
+        <div className="page-title">PROMPT LIBRARY</div>
+        <div className="page-sub">Copy any prompt and paste it into Claude to build that component or module.</div>
+
+        <div className="pl-stats-row">
+          <div className="pl-stat"><span className="pl-stat-n">4</span><span className="pl-stat-l">Foundation</span></div>
+          <div className="pl-stat"><span className="pl-stat-n">8</span><span className="pl-stat-l">Module Builds</span></div>
+          <div className="pl-stat"><span className="pl-stat-n">3</span><span className="pl-stat-l">Data Tools</span></div>
+          <div className="pl-stat"><span className="pl-stat-n">4</span><span className="pl-stat-l">Extensions</span></div>
+        </div>
+
+        <div className="pl-search-wrap">
+          <span className="pl-search-icon">🔍</span>
+          <input className="pl-search" placeholder="Search prompts…" value={promptSearch} onChange={e=>setPromptSearch(e.target.value)}/>
+        </div>
+
+        <div className="pl-cats">
+          {PROMPT_CATS.map(c=>(
+            <button key={c.id} className={`pill${promptCat===c.id?' on':''}`} onClick={()=>setPromptCat(c.id)}>{c.label}</button>
+          ))}
+        </div>
+
+        {groups.map(g=>(
+          <div key={g.cat}>
+            <div className="sec-lbl">{g.label}</div>
+            {g.items.map(p=>(
+              <div key={p.id} className="pl-card">
+                <div className="pl-hdr" onClick={()=>setPromptOpen(s=>({...s,[p.id]:!s[p.id]}))}>
+                  <div className="pl-meta">
+                    <div className="pl-title">{p.title}</div>
+                    <div className="pl-desc">{p.desc}</div>
+                    <div className="pl-tags">
+                      {p.tags.map(t=><span key={t} className={`pl-tag ${TYPE_COLOR[p.type]||''}`}>{t}</span>)}
+                    </div>
+                  </div>
+                  <div className="pl-acts">
+                    <button className={`btn-sm${promptCopied[p.id]?' g':''}`}
+                      onClick={e=>{e.stopPropagation();copyPrompt(p);}}>
+                      {promptCopied[p.id]?'✓ Copied':'Copy'}
+                    </button>
+                    <span style={{fontFamily:'var(--fm)',fontSize:10,color:'var(--t3)',padding:4}}>
+                      {promptOpen[p.id]?'▲':'▼'}
+                    </span>
+                  </div>
+                </div>
+                {promptOpen[p.id]&&(
+                  <div className="pl-body">
+                    <div className="pl-text">{p.text}</div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ))}
+
+        {filtered.length===0&&(
+          <div style={{textAlign:'center',padding:'40px 20px',color:'var(--t3)',fontFamily:'var(--fm)',fontSize:10,letterSpacing:1}}>
+            NO PROMPTS MATCH YOUR SEARCH
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // ─── SHELL ────────────────────────────────────────────────────────────────
 
   const NAV_ITEMS=[
@@ -1400,6 +1896,7 @@ function RIS() {
     {id:'analyse',icon:'🎯',label:'ANALYSE',amber:false},
     {id:'skills',icon:'🎓',label:'SKILLS',amber:false},
     {id:'exports',icon:'📋',label:'DOCS',amber:true},
+    {id:'prompts',icon:'📚',label:'PROMPTS',amber:false},
   ];
 
   return(
@@ -1415,7 +1912,6 @@ function RIS() {
           <div className="hdr-right">
             <div className="dot"/>
             {soulDoc?<span style={{color:'var(--amber)',fontSize:9,marginLeft:4}}>{team.name?.toUpperCase()}</span>:<span>LIVE</span>}
-            <a href="/prompts.html" style={{fontFamily:'var(--fm)',fontSize:8,color:'var(--t3)',textDecoration:'none',marginLeft:10,border:'1px solid var(--b)',padding:'2px 6px',borderRadius:3,letterSpacing:'1px'}} title="Prompt Library">PROMPTS</a>
           </div>
         </div>
 
@@ -1424,6 +1920,7 @@ function RIS() {
         {view==='analyse'&&renderAnalyse()}
         {view==='skills'&&renderSkills()}
         {view==='exports'&&renderExports()}
+        {view==='prompts'&&renderPrompts()}
 
         <div className="nav">
           {NAV_ITEMS.map(n=>(
