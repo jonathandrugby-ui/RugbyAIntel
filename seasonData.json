@@ -1,0 +1,2007 @@
+{
+  "club": "Warwick Pumas RFC",
+  "season": "2024",
+  "fixtures": [
+    {
+      "section": "Warmup",
+      "round": 1,
+      "opposition": "False Bay",
+      "venue": "HOME",
+      "date": "2024-02-16",
+      "result": "Loss",
+      "pointsFor": 0,
+      "pointsAgainst": 55,
+      "tries": 0,
+      "pointsDiff": -55,
+      "outcome": "L"
+    },
+    {
+      "section": "Warmup",
+      "round": 2,
+      "opposition": "Rocklands",
+      "venue": "AWAY",
+      "date": "2024-02-24",
+      "result": "Win",
+      "pointsFor": 19,
+      "pointsAgainst": 17,
+      "tries": 3,
+      "pointsDiff": 2,
+      "outcome": "W"
+    },
+    {
+      "section": "Warmup",
+      "round": 3,
+      "opposition": "UCT",
+      "venue": "AWAY",
+      "date": "2024-03-09",
+      "result": "Loss",
+      "pointsFor": 19,
+      "pointsAgainst": 24,
+      "tries": 3,
+      "pointsDiff": -5,
+      "outcome": "L"
+    },
+    {
+      "section": "Warmup",
+      "round": 4,
+      "opposition": "Tygerberg",
+      "venue": "AWAY",
+      "date": "2024-03-16",
+      "result": "Loss",
+      "pointsFor": 7,
+      "pointsAgainst": 103,
+      "tries": 1,
+      "pointsDiff": -96,
+      "outcome": "L"
+    },
+    {
+      "section": "Warmup",
+      "round": 5,
+      "opposition": "Goodwood",
+      "venue": "AWAY",
+      "date": "2024-03-23",
+      "result": "Loss",
+      "pointsFor": 7,
+      "pointsAgainst": 60,
+      "tries": 1,
+      "pointsDiff": -53,
+      "outcome": "L"
+    },
+    {
+      "section": "League",
+      "round": 1,
+      "opposition": "Eersterivier",
+      "venue": "AWAY",
+      "date": "2024-04-13",
+      "result": "Loss",
+      "pointsFor": 18,
+      "pointsAgainst": 36,
+      "tries": 3,
+      "pointsDiff": -18,
+      "outcome": "L"
+    },
+    {
+      "section": "League",
+      "round": 2,
+      "opposition": "Blue Jets",
+      "venue": "HOME",
+      "date": "2024-04-20",
+      "result": "Loss",
+      "pointsFor": 18,
+      "pointsAgainst": 22,
+      "tries": 2,
+      "pointsDiff": -4,
+      "outcome": "L"
+    },
+    {
+      "section": "League",
+      "round": 3,
+      "opposition": "Young Peoples",
+      "venue": "AWAY",
+      "date": "2024-05-04",
+      "result": "Loss",
+      "pointsFor": 13,
+      "pointsAgainst": 17,
+      "tries": 2,
+      "pointsDiff": -4,
+      "outcome": "L"
+    },
+    {
+      "section": "League",
+      "round": 4,
+      "opposition": "Atlantis",
+      "venue": "AWAY",
+      "date": "2024-05-11",
+      "result": "Loss",
+      "pointsFor": 17,
+      "pointsAgainst": 26,
+      "tries": 2,
+      "pointsDiff": -9,
+      "outcome": "L"
+    },
+    {
+      "section": "League",
+      "round": 5,
+      "opposition": "Pniel Villagers",
+      "venue": "HOME",
+      "date": "2024-05-18",
+      "result": "Loss",
+      "pointsFor": 17,
+      "pointsAgainst": 29,
+      "tries": 3,
+      "pointsDiff": -12,
+      "outcome": "L"
+    },
+    {
+      "section": "League",
+      "round": 6,
+      "opposition": "Rangers",
+      "venue": "AWAY",
+      "date": "2024-05-25",
+      "result": "Loss",
+      "pointsFor": 15,
+      "pointsAgainst": 33,
+      "tries": 2,
+      "pointsDiff": -18,
+      "outcome": "L"
+    },
+    {
+      "section": "League",
+      "round": 7,
+      "opposition": "Primrose",
+      "venue": "AWAY",
+      "date": "2024-06-01",
+      "result": "Loss",
+      "pointsFor": 8,
+      "pointsAgainst": 64,
+      "tries": 1,
+      "pointsDiff": -56,
+      "outcome": "L"
+    },
+    {
+      "section": "League",
+      "round": 8,
+      "opposition": "Macassar",
+      "venue": "HOME",
+      "date": "2024-06-08",
+      "result": "Loss",
+      "pointsFor": 8,
+      "pointsAgainst": 43,
+      "tries": 1,
+      "pointsDiff": -35,
+      "outcome": "L"
+    },
+    {
+      "section": "League",
+      "round": 9,
+      "opposition": "Paarl",
+      "venue": "HOME",
+      "date": "2024-06-22",
+      "result": "Win",
+      "pointsFor": 28,
+      "pointsAgainst": 0,
+      "tries": 4,
+      "pointsDiff": 28,
+      "outcome": "W"
+    },
+    {
+      "section": "League",
+      "round": 10,
+      "opposition": "Busy Bees",
+      "venue": "HOME",
+      "date": "2024-07-06",
+      "result": "Loss",
+      "pointsFor": 15,
+      "pointsAgainst": 27,
+      "tries": 2,
+      "pointsDiff": -12,
+      "outcome": "L"
+    },
+    {
+      "section": "League",
+      "round": 11,
+      "opposition": "Strand United",
+      "venue": "AWAY",
+      "date": "2024-07-27",
+      "result": "Win",
+      "pointsFor": 13,
+      "pointsAgainst": 12,
+      "tries": 1,
+      "pointsDiff": 1,
+      "outcome": "W"
+    },
+    {
+      "section": "League",
+      "round": 12,
+      "opposition": "Gardens",
+      "venue": "AWAY",
+      "date": "2024-08-10",
+      "result": "Loss",
+      "pointsFor": 3,
+      "pointsAgainst": 14,
+      "tries": 0,
+      "pointsDiff": -11,
+      "outcome": "L"
+    },
+    {
+      "section": "League",
+      "round": 13,
+      "opposition": "Scottsdene",
+      "venue": "HOME",
+      "date": "2024-08-17",
+      "result": "Loss",
+      "pointsFor": 25,
+      "pointsAgainst": 26,
+      "tries": 4,
+      "pointsDiff": -1,
+      "outcome": "L"
+    },
+    {
+      "section": "League",
+      "round": 14,
+      "opposition": "Goodwood (R2)",
+      "venue": "HOME",
+      "date": "2024-08-03",
+      "result": "Loss",
+      "pointsFor": 5,
+      "pointsAgainst": 45,
+      "tries": 1,
+      "pointsDiff": -40,
+      "outcome": "L"
+    }
+  ],
+  "squad": [
+    {
+      "id": 1,
+      "position": "Utility Back",
+      "firstName": "Adon",
+      "lastName": "Blaaws",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 2,
+      "position": "Utility Forward",
+      "firstName": "Luca",
+      "lastName": "Ambrosi",
+      "contacted": "Yes",
+      "status": "No",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 3,
+      "position": "Wing",
+      "firstName": "Jesse Lee",
+      "lastName": "Barnier",
+      "contacted": "Yes",
+      "status": "No",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 4,
+      "position": "Utility Forward",
+      "firstName": "Vuyo",
+      "lastName": "Bistoli",
+      "contacted": "Yes",
+      "status": "Unknown",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 5,
+      "position": "Prop",
+      "firstName": "Luthando",
+      "lastName": "Bulana",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 6,
+      "position": "Wing",
+      "firstName": "Arnold",
+      "lastName": "Bunu",
+      "contacted": "Yes",
+      "status": "No",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 7,
+      "position": "Utility Forward",
+      "firstName": "Richwen",
+      "lastName": "Codee Waries",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Injured",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 8,
+      "position": "Utility Forward",
+      "firstName": "Ethan",
+      "lastName": "Coetzee",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 9,
+      "position": "Utility Forward",
+      "firstName": "Reginald",
+      "lastName": "Fulla",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 10,
+      "position": "Prop",
+      "firstName": "Nathan",
+      "lastName": "Gogela",
+      "contacted": "Yes",
+      "status": "No",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 11,
+      "position": "Utility Back",
+      "firstName": "Luigi",
+      "lastName": "Grootboom",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 12,
+      "position": "Utility Forward",
+      "firstName": "Jason",
+      "lastName": "Hendry",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 13,
+      "position": "Utility Back",
+      "firstName": "Jason",
+      "lastName": "Holt",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 14,
+      "position": "Utility Forward",
+      "firstName": "Tuan",
+      "lastName": "Horne",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 15,
+      "position": "Lock",
+      "firstName": "Alex",
+      "lastName": "Jekwa",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 16,
+      "position": "Scrumhalf",
+      "firstName": "John-Pierre",
+      "lastName": "Joseph",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 17,
+      "position": "Utility Forward",
+      "firstName": "Jacques",
+      "lastName": "Joubert",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 18,
+      "position": "Wing",
+      "firstName": "Damon",
+      "lastName": "Lamb",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 19,
+      "position": "Utility Forward",
+      "firstName": "Jean-Pierre",
+      "lastName": "Lieberum",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 20,
+      "position": "Utility Forward",
+      "firstName": "Xolani",
+      "lastName": "Mahlulo",
+      "contacted": "Yes",
+      "status": "No",
+      "physical": "Injured",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 21,
+      "position": "Utility Forward",
+      "firstName": "Siyabonga",
+      "lastName": "Mbali",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 22,
+      "position": "Flyhalf",
+      "firstName": "Justin",
+      "lastName": "Meyer",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 23,
+      "position": "Centre",
+      "firstName": "Elihle",
+      "lastName": "Mgoboli",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 24,
+      "position": "Utility Back",
+      "firstName": "Desmond",
+      "lastName": "Mosinkie",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 25,
+      "position": "Utility Back",
+      "firstName": "Keenan",
+      "lastName": "Mowers",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 26,
+      "position": "Utility Forward",
+      "firstName": "Ayabulela",
+      "lastName": "Nadyokwe",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 27,
+      "position": "Wing",
+      "firstName": "Aviwe",
+      "lastName": "Ncontso",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 28,
+      "position": "Prop",
+      "firstName": "Athule",
+      "lastName": "Ntanyana",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 29,
+      "position": "Utility Forward",
+      "firstName": "Jared",
+      "lastName": "Peiser",
+      "contacted": "Yes",
+      "status": "Unknown",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 30,
+      "position": "Utility Back",
+      "firstName": "Gareth",
+      "lastName": "Petersen",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 31,
+      "position": "Flyhalf",
+      "firstName": "Jade",
+      "lastName": "Schoeman",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 32,
+      "position": "Centre",
+      "firstName": "Shane",
+      "lastName": "Steele",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 33,
+      "position": "Fullback",
+      "firstName": "Khulasande",
+      "lastName": "Stemela",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 34,
+      "position": "Utility Forward",
+      "firstName": "Siyamthemba",
+      "lastName": "Stemela",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 35,
+      "position": "Scrumhalf",
+      "firstName": "Mawabo",
+      "lastName": "Totshini",
+      "contacted": "Yes",
+      "status": "No",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 36,
+      "position": "Wing",
+      "firstName": "Zolile",
+      "lastName": "Twani",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 37,
+      "position": "Utility Forward",
+      "firstName": "Thandolwethu",
+      "lastName": "Vintwembi",
+      "contacted": "Yes",
+      "status": "Unknown",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 38,
+      "position": "Utility Back",
+      "firstName": "Elzarin",
+      "lastName": "Witbooi",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 39,
+      "position": "Utility Back",
+      "firstName": "Lyle",
+      "lastName": "Wyngaard",
+      "contacted": "Yes",
+      "status": "Committed",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 40,
+      "position": "Utility Forward",
+      "firstName": "Deacon",
+      "lastName": "Wallace",
+      "contacted": "Yes",
+      "status": "Unknown",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 41,
+      "position": "Utility Forward",
+      "firstName": "Sipho",
+      "lastName": "Booysen",
+      "contacted": "Yes",
+      "status": "No",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    },
+    {
+      "id": 42,
+      "position": "Scrumhalf",
+      "firstName": "Yamkela",
+      "lastName": "Mangxola",
+      "contacted": "Yes",
+      "status": "No",
+      "physical": "Good",
+      "contractSigned": "No",
+      "notes": ""
+    }
+  ],
+  "caps": [
+    {
+      "rank": 1,
+      "firstName": "Siyasanga",
+      "lastName": "Mkiva",
+      "caps": 224,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 2,
+      "firstName": "Ayabulela",
+      "lastName": "Nadyokwe",
+      "caps": 176,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 3,
+      "firstName": "Mawabo",
+      "lastName": "Totshini",
+      "caps": 126,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 4,
+      "firstName": "Siyabonga",
+      "lastName": "Mbali",
+      "caps": 99,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 5,
+      "firstName": "Ritchwin",
+      "lastName": "Waries",
+      "caps": 91,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 6,
+      "firstName": "Xolani",
+      "lastName": "Mahlulo",
+      "caps": 69,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 7,
+      "firstName": "Thandolwethu",
+      "lastName": "Vintwembi",
+      "caps": 67,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 8,
+      "firstName": "Zolile",
+      "lastName": "Twani",
+      "caps": 63,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 9,
+      "firstName": "Luigi",
+      "lastName": "Grootboom",
+      "caps": 46,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 10,
+      "firstName": "Anville",
+      "lastName": "Van Wyk",
+      "caps": 45,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 11,
+      "firstName": "Khulasande",
+      "lastName": "Stemela",
+      "caps": 37,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 12,
+      "firstName": "Gareth",
+      "lastName": "Petersen",
+      "caps": 35,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 13,
+      "firstName": "Alex",
+      "lastName": "Jekwa",
+      "caps": 33,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 14,
+      "firstName": "Shane",
+      "lastName": "Steele",
+      "caps": 33,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 15,
+      "firstName": "Reginald",
+      "lastName": "Fulla",
+      "caps": 29,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 16,
+      "firstName": "Jean-Pierre",
+      "lastName": "Lieberum",
+      "caps": 24,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 17,
+      "firstName": "Luthando",
+      "lastName": "Bulana",
+      "caps": 24,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 18,
+      "firstName": "John-Pierre",
+      "lastName": "Joseph",
+      "caps": 23,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 19,
+      "firstName": "Justin",
+      "lastName": "Meyer",
+      "caps": 21,
+      "seasonCaps": 0
+    },
+    {
+      "rank": 20,
+      "firstName": "Adon",
+      "lastName": "Blaaws",
+      "caps": 19,
+      "seasonCaps": 0
+    }
+  ],
+  "unavailability": [
+    {
+      "firstName": "Jean-Jacques",
+      "lastName": "Mentoor",
+      "reason": "Shoulder",
+      "category": "Injury",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Tuan",
+      "lastName": "Horne",
+      "reason": "Knee",
+      "category": "Injury",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Alex",
+      "lastName": "Jekwa",
+      "reason": "Neck",
+      "category": "Injury",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Gareth",
+      "lastName": "Petersen",
+      "reason": "Thumb",
+      "category": "Injury",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Joe",
+      "lastName": "Lyons",
+      "reason": "Studies",
+      "category": "Away/Work",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Kurt-Leigh",
+      "lastName": "Adams",
+      "reason": "Work",
+      "category": "Away/Work",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Ndumiso",
+      "lastName": "Mhlanzi",
+      "reason": "Left club",
+      "category": "Left Club",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Jason",
+      "lastName": "Loggenberg",
+      "reason": "Left club",
+      "category": "Left Club",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Kyle",
+      "lastName": "Van Niekerk",
+      "reason": "Left club",
+      "category": "Left Club",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Roscoe",
+      "lastName": "Knight",
+      "reason": "Rigging",
+      "category": "Left Club",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Kyle",
+      "lastName": "Steele",
+      "reason": "Yachting",
+      "category": "Season",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Steven",
+      "lastName": "Gadziwa",
+      "reason": "Retired",
+      "category": "Season",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Jade",
+      "lastName": "Schoeman",
+      "reason": "Work",
+      "category": "Season",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Siyasanga",
+      "lastName": "Mkiva",
+      "reason": "Retired",
+      "category": "Season",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Lyle",
+      "lastName": "Wyngaard",
+      "reason": "Life/Work",
+      "category": "Season",
+      "returnDate": "Unknown"
+    },
+    {
+      "firstName": "Jacques",
+      "lastName": "Joubert",
+      "reason": "Work/Family",
+      "category": "Season",
+      "returnDate": "Unknown"
+    }
+  ],
+  "lingo": [
+    {
+      "phase": "Attack",
+      "term": "BLACK",
+      "meaning": "Backs ball / ball to wings / quick hands"
+    },
+    {
+      "phase": "Defence",
+      "term": "PILLAR / POST / OBS",
+      "meaning": "1st, 2nd, 3rd defender arriving at the ruck"
+    },
+    {
+      "phase": "Attack",
+      "term": "BRUMBY",
+      "meaning": "Ball played behind player or forward pod (dummy pod / block runner)"
+    },
+    {
+      "phase": "Defence",
+      "term": "JACKLE",
+      "meaning": "Brace over tackle to steal the ball"
+    },
+    {
+      "phase": "Attack",
+      "term": "PLUS / ZIP",
+      "meaning": "Short pass from ball carrier to outside support"
+    },
+    {
+      "phase": "Defence",
+      "term": "DOUBLES",
+      "meaning": "Double hit tackles on ball carrier"
+    },
+    {
+      "phase": "Attack",
+      "term": "MINUS",
+      "meaning": "Short pass from ball carrier to inside cleaner / support"
+    },
+    {
+      "phase": "Defence",
+      "term": "CHOP",
+      "meaning": "Chop tackle legs"
+    },
+    {
+      "phase": "Attack",
+      "term": "RIO",
+      "meaning": "Play and attack right side of field"
+    },
+    {
+      "phase": "Defence",
+      "term": "VOETE",
+      "meaning": "Give referee the offside line"
+    },
+    {
+      "phase": "Attack",
+      "term": "LONDON",
+      "meaning": "Play and attack left side of field"
+    },
+    {
+      "phase": "Defence",
+      "term": "CRUSADER",
+      "meaning": "Everyone out the ruck; numbers on feet"
+    },
+    {
+      "phase": "Attack",
+      "term": "TAXI",
+      "meaning": "Shape off 9 \u2014 Taxi, Big Taxi, Inside Cleaner, Stormers"
+    },
+    {
+      "phase": "Defence",
+      "term": "FIRE",
+      "meaning": "Counter ruck and drive through the ruck"
+    },
+    {
+      "phase": "Attack",
+      "term": "BUS",
+      "meaning": "Shape off 10 \u2014 Bus, Big Bus, Inside Cleaner, Stormers"
+    },
+    {
+      "phase": "Defence",
+      "term": "CHOKE",
+      "meaning": "Hold player up in tackle (form maul)"
+    },
+    {
+      "phase": "Attack",
+      "term": "BULLS",
+      "meaning": "Forwards pick and drive"
+    },
+    {
+      "phase": "Defence",
+      "term": "CATCH-UP",
+      "meaning": "Defender on the inside of the hitter / tackler"
+    },
+    {
+      "phase": "Attack",
+      "term": "STORMERS",
+      "meaning": "Back pass from ball carrier to 10 or 12; outside Plus runs a blocking line"
+    },
+    {
+      "phase": "Defence",
+      "term": "BLITZ",
+      "meaning": "Pressing defence"
+    },
+    {
+      "phase": "Attack",
+      "term": "FIELD DIVISION",
+      "meaning": "BMW \u2014 B = LEFT, M = MIDDLE, W = RIGHT"
+    },
+    {
+      "phase": "Defence",
+      "term": "RUGBY ZONE",
+      "meaning": "Field between 22 metre lines"
+    },
+    {
+      "phase": "Attack",
+      "term": "M0 + VACUUM M0",
+      "meaning": "Attack middle then go wide"
+    },
+    {
+      "phase": "Defence",
+      "term": "GREEN ZONE",
+      "meaning": "Attacking half \u2014 build phases here"
+    },
+    {
+      "phase": "Attack",
+      "term": "M10 + VACUUM M10",
+      "meaning": "Attack middle, same way with Super Taxi"
+    },
+    {
+      "phase": "Defence",
+      "term": "NEWLANDS ZONE",
+      "meaning": "Our own 22 \u2014 clear or contest only"
+    },
+    {
+      "phase": "Attack",
+      "term": "TEXAS",
+      "meaning": "Counter attack formation off kicks"
+    },
+    {
+      "phase": "Defence",
+      "term": "RED ZONE",
+      "meaning": "Opposition 22 \u2014 no extras, keep it simple"
+    },
+    {
+      "phase": "Attack",
+      "term": "INDIA",
+      "meaning": "Lineout plays (A, B, BUNCH, STEELE, RHINO)"
+    },
+    {
+      "phase": "Defence",
+      "term": "CROSSFIELD KICK",
+      "meaning": "COKE \u2014 right side"
+    },
+    {
+      "phase": "Attack",
+      "term": "SIYA",
+      "meaning": "Lineout plays \u2014 A and B variants"
+    },
+    {
+      "phase": "Defence",
+      "term": "CROSSFIELD KICK",
+      "meaning": "ICE \u2014 left side"
+    },
+    {
+      "phase": "Attack",
+      "term": "JEKWA",
+      "meaning": "24 back option, 42 front option"
+    },
+    {
+      "phase": "Defence",
+      "term": "EXIT KICKS",
+      "meaning": "NEWLANDS / EXITS \u2014 kick to touch"
+    },
+    {
+      "phase": "Attack",
+      "term": "PINK PANTHER",
+      "meaning": "Quick tap play"
+    },
+    {
+      "phase": "Attack",
+      "term": "NEWLANDS ZONE",
+      "meaning": "Inside our own 22"
+    },
+    {
+      "phase": "Attack",
+      "term": "RED ZONE",
+      "meaning": "Opposition 22"
+    }
+  ],
+  "facets": [
+    {
+      "rank": 1,
+      "facet": "Defensive Systems and Tackling",
+      "pct": "22%",
+      "minutes": "26 min",
+      "tier": "CRITICAL",
+      "subfacets": "Line speed \u00b7 Tackle technique \u00b7 Defensive shape \u00b7 Spacing \u00b7 Dominant collision \u00b7 Chop tackle \u00b7 Blitz/drift \u00b7 Communication",
+      "notes": "Missed tackles and spacing errors lose games faster than poor attack. Must drill daily. Non-negotiable."
+    },
+    {
+      "rank": 2,
+      "facet": "Attack Shape and Phase Play",
+      "pct": "18%",
+      "minutes": "22 min",
+      "tier": "CRITICAL",
+      "subfacets": "Forward pod structure \u00b7 Backline alignment \u00b7 Strike plays \u00b7 Phase continuity \u00b7 Edge attack \u00b7 Middle-field manipulation \u00b7 Shape transitions",
+      "notes": "Teams spend 60-70% of possession time in phase organisation. Shape fluency reduces hesitation under fatigue."
+    },
+    {
+      "rank": 3,
+      "facet": "Breakdown and Ruck Speed",
+      "pct": "15%",
+      "minutes": "18 min",
+      "tier": "CRITICAL",
+      "subfacets": "Arrival timing \u00b7 Cleanout technique \u00b7 Ball presentation \u00b7 Ruck spacing \u00b7 Jackal systems \u00b7 Counter-ruck \u00b7 Fast-ball generation",
+      "notes": "Breakdown dictates tempo, momentum, possession quality and fatigue accumulation. Non-negotiable weekly focus."
+    },
+    {
+      "rank": 4,
+      "facet": "Set Piece \u2014 Scrum and Lineout",
+      "pct": "14%",
+      "minutes": "17 min",
+      "tier": "CRITICAL",
+      "subfacets": "Scrum shape and binding \u00b7 Engagement timing \u00b7 Throwing accuracy \u00b7 Jump/lift mechanics \u00b7 Calling systems \u00b7 Maul setup and defence \u00b7 Defensive lineout",
+      "notes": "Set piece determines launch quality, territory, penalties and psychological control. Dominance here wins field position."
+    },
+    {
+      "rank": 5,
+      "facet": "Tactical Kicking and Exit Systems",
+      "pct": "10%",
+      "minutes": "12 min",
+      "tier": "IMPORTANT",
+      "subfacets": "Exit structure \u00b7 Box kick systems \u00b7 Touch finding \u00b7 Grubber/chip \u00b7 Kick receipt \u00b7 Restart kicks \u00b7 Territorial chess \u00b7 50/22 trigger recognition",
+      "notes": "Rugby is territory-driven. Poor exits destroy defensive energy and invite sustained pressure phases."
+    },
+    {
+      "rank": 6,
+      "facet": "Conditioning and Collision Fitness",
+      "pct": "6%",
+      "minutes": "7 min",
+      "tier": "IMPORTANT",
+      "subfacets": "Aerobic base \u00b7 Repeat sprint ability \u00b7 Contact conditioning \u00b7 Match fitness \u00b7 Collision volume under fatigue \u00b7 Recovery capacity",
+      "notes": "Must be maintained weekly in-season but not overloaded. Integrate within contact drills where possible."
+    },
+    {
+      "rank": 7,
+      "facet": "Restarts and Aerial Systems",
+      "pct": "4%",
+      "minutes": "5 min",
+      "tier": "SUPPORTING",
+      "subfacets": "Kickoff receipt structures \u00b7 Aerial contest \u00b7 Contestable restarts \u00b7 Deep territorial restarts \u00b7 Exit shape \u00b7 Chase pod organisation",
+      "notes": "Restart ownership creates momentum swings and territorial pressure. 4-5 restarts per match \u2014 each one matters."
+    },
+    {
+      "rank": 8,
+      "facet": "Game Management and Scenario Training",
+      "pct": "4%",
+      "minutes": "5 min",
+      "tier": "SUPPORTING",
+      "subfacets": "Playing with a lead \u00b7 Chasing game \u00b7 14-man rugby \u00b7 Wet weather \u00b7 Final five minutes \u00b7 Clock manipulation \u00b7 One-score scenarios",
+      "notes": "Clutch moments decide elite matches. Teams must rehearse pressure scenarios weekly to reduce decision hesitation."
+    },
+    {
+      "rank": 9,
+      "facet": "Position-Specific Micro Skills",
+      "pct": "3%",
+      "minutes": "4 min",
+      "tier": "SUPPLEMENTARY",
+      "subfacets": "Scrumhalf service \u00b7 Flyhalf kicking game \u00b7 Lineout calling \u00b7 Back-three aerial \u00b7 Front-row mobility \u00b7 Loosie breakdown roles",
+      "notes": "Small refinements maintain technical sharpness. Best integrated into unit sessions within set piece and attack blocks."
+    },
+    {
+      "rank": 10,
+      "facet": "Transition and Broken Play",
+      "pct": "2%",
+      "minutes": "2 min",
+      "tier": "SUPPLEMENTARY",
+      "subfacets": "Turnover attack launch \u00b7 Counterattack structure \u00b7 Scramble defence \u00b7 Broken field scanning \u00b7 Reconnection speed",
+      "notes": "Broken-field chaos creates high-value tries and catastrophic defensive risks. Drill recognition, not systems."
+    },
+    {
+      "rank": 11,
+      "facet": "Discipline and Referee Adaptation",
+      "pct": "1%",
+      "minutes": "1 min",
+      "tier": "SUPPLEMENTARY",
+      "subfacets": "Penalty reduction \u00b7 High tackle prevention \u00b7 Referee picture management \u00b7 Captain communication \u00b7 Emotional discipline",
+      "notes": "Integrated throughout all training. Address patterns early in the week based on referee tendency and last match data."
+    },
+    {
+      "rank": 12,
+      "facet": "Psychological Prep and Leadership",
+      "pct": "1%",
+      "minutes": "1 min",
+      "tier": "SUPPLEMENTARY",
+      "subfacets": "Pressure handling \u00b7 Resilience \u00b7 Team talks \u00b7 Accountability \u00b7 Emotional regulation \u00b7 Confidence \u00b7 Leadership group activation",
+      "notes": "Present daily in culture and expectation. Rarely dominates field session time. Embedded in standards and rituals."
+    }
+  ],
+  "planner": [
+    {
+      "type": "session",
+      "day": "Monday",
+      "start": "08:00",
+      "duration": "60 min",
+      "facet": "Recovery Session",
+      "activity": "Cold/contrast therapy, static stretching, mobility work, hydration protocol",
+      "lead": "S&C Coach",
+      "assist": "Physio",
+      "priority": "SUPP."
+    },
+    {
+      "type": "session",
+      "day": "Monday",
+      "start": "10:00",
+      "duration": "45 min",
+      "facet": "Video Analysis \u2014 Full Team",
+      "activity": "Full-game review: tackle completion, breakdown speed, exits, set-piece. Focus on patterns not individual errors",
+      "lead": "Head Coach",
+      "assist": "Analyst",
+      "priority": "SUPPORTING"
+    },
+    {
+      "type": "session",
+      "day": "Monday",
+      "start": "11:00",
+      "duration": "30 min",
+      "facet": "Unit Review \u2014 Forwards",
+      "activity": "Scrum and lineout clip review. Binding faults, jumping mechanics, maul exits",
+      "lead": "Forwards Coach",
+      "assist": "Head Coach",
+      "priority": "IMPORTANT"
+    },
+    {
+      "type": "session",
+      "day": "Monday",
+      "start": "11:30",
+      "duration": "30 min",
+      "facet": "Unit Review \u2014 Backs",
+      "activity": "Attack shape review: depth, alignment, decision timing. Kick receipt and exit execution",
+      "lead": "Backs Coach",
+      "assist": "Head Coach",
+      "priority": "IMPORTANT"
+    },
+    {
+      "type": "session",
+      "day": "Monday",
+      "start": "14:00",
+      "duration": "45 min",
+      "facet": "Leadership Group Meeting",
+      "activity": "Weekly debrief: culture, standards, captain accountability, team goal alignment. Agenda set by captain",
+      "lead": "Head Coach",
+      "assist": "Captain",
+      "priority": "SUPP."
+    },
+    {
+      "type": "day",
+      "label": "TUESDAY  \u2014  FIELD SESSION 1  |  DEFENCE \u00b7 BREAKDOWN \u00b7 CONDITIONING  (120 min)"
+    },
+    {
+      "type": "session",
+      "day": "Tuesday",
+      "start": "18:00",
+      "duration": "15 min",
+      "facet": "Warm-Up \u2014 Individual Activation",
+      "activity": "SAQ runs \u00b7 passing pairs \u00b7 passing under pressure \u00b7 dynamic stretch \u00b7 band activation",
+      "lead": "S&C Coach",
+      "assist": "All",
+      "priority": "SUPP."
+    },
+    {
+      "type": "session",
+      "day": "Tuesday",
+      "start": "18:15",
+      "duration": "10 min",
+      "facet": "Touch Rugby \u2014 High Tempo",
+      "activity": "Fast tempo touch \u2014 focus on communication calls and line speed triggering",
+      "lead": "Backs Coach",
+      "assist": "All",
+      "priority": "SUPPORTING"
+    },
+    {
+      "type": "session",
+      "day": "Tuesday",
+      "start": "18:25",
+      "duration": "5 min",
+      "facet": "Coach Chat and Unit Split",
+      "activity": "Clarity session: weekly goal, opposition insight, defensive call of the week",
+      "lead": "Head Coach",
+      "assist": "All",
+      "priority": "SUPP."
+    },
+    {
+      "type": "session",
+      "day": "Tuesday",
+      "start": "18:30",
+      "duration": "26 min",
+      "facet": "DEFENCE  \u2014  Tackle Technique and Defensive Shape",
+      "activity": "Chop tackle reps \u00b7 dominant tackle drill \u00b7 2v1 defensive spacing \u00b7 blitz/drift trigger sets \u00b7 communication under fatigue",
+      "lead": "Forwards Coach",
+      "assist": "Backs Coach",
+      "priority": "CRITICAL"
+    },
+    {
+      "type": "session",
+      "day": "Tuesday",
+      "start": "18:56",
+      "duration": "18 min",
+      "facet": "BREAKDOWN  \u2014  Clearout and Jackal Combat",
+      "activity": "Cleanout body position \u00b7 seal technique \u00b7 jackal timing and clamp \u00b7 counter-ruck reps \u00b7 ball presentation under pressure",
+      "lead": "Head Coach",
+      "assist": "Forwards Coach",
+      "priority": "CRITICAL"
+    },
+    {
+      "type": "session",
+      "day": "Tuesday",
+      "start": "19:14",
+      "duration": "8 min",
+      "facet": "WATER BREAK / RESET",
+      "activity": "Hydration \u00b7 brief tactical reminder \u00b7 energy reset",
+      "lead": "Manager",
+      "assist": "\u2014",
+      "priority": "SUPP."
+    },
+    {
+      "type": "session",
+      "day": "Tuesday",
+      "start": "19:22",
+      "duration": "15 min",
+      "facet": "CONDITIONING  \u2014  Contact and Collision Block",
+      "activity": "Hit-and-reload sets \u00b7 carry-into-contact conditioning \u00b7 tackle-and-reload circuit \u00b7 collision under fatigue",
+      "lead": "S&C Coach",
+      "assist": "All",
+      "priority": "IMPORTANT"
+    },
+    {
+      "type": "session",
+      "day": "Tuesday",
+      "start": "19:37",
+      "duration": "10 min",
+      "facet": "DEFENCE  \u2014  Defensive Line and Spacing",
+      "activity": "Full defensive line walk-through \u00b7 then live reps at 70% pace \u00b7 fold system \u00b7 communication sequences",
+      "lead": "Backs Coach",
+      "assist": "Head Coach",
+      "priority": "CRITICAL"
+    },
+    {
+      "type": "session",
+      "day": "Tuesday",
+      "start": "19:47",
+      "duration": "8 min",
+      "facet": "TRANSITION  \u2014  Turnover Defence to Attack",
+      "activity": "Scramble defence after turnover \u00b7 reconnection speed \u00b7 counterattack launch off turnover ball",
+      "lead": "Head Coach",
+      "assist": "All",
+      "priority": "SUPP."
+    },
+    {
+      "type": "session",
+      "day": "Tuesday",
+      "start": "19:55",
+      "duration": "5 min",
+      "facet": "Cool Down and Review",
+      "activity": "Static stretch \u00b7 positional accountability chat \u00b7 brief review of key moments",
+      "lead": "S&C Coach",
+      "assist": "All",
+      "priority": "SUPP."
+    },
+    {
+      "type": "day",
+      "label": "WEDNESDAY  \u2014  CROSSFIT / STRENGTH SESSION  (90 min)"
+    },
+    {
+      "type": "session",
+      "day": "Wednesday",
+      "start": "19:00",
+      "duration": "20 min",
+      "facet": "Warm-Up and Mobility",
+      "activity": "Full-body warmup \u00b7 thoracic and hip mobility \u00b7 shoulder activation \u00b7 scrum-specific prep",
+      "lead": "S&C Coach",
+      "assist": "All",
+      "priority": "SUPP."
+    },
+    {
+      "type": "session",
+      "day": "Wednesday",
+      "start": "19:20",
+      "duration": "35 min",
+      "facet": "CONDITIONING \u2014 Strength and Power Block",
+      "activity": "Squat/deadlift/hinge patterns \u00b7 upper push/pull \u00b7 explosive plyometric work \u00b7 scrum-specific loading",
+      "lead": "S&C Coach",
+      "assist": "All",
+      "priority": "IMPORTANT"
+    },
+    {
+      "type": "session",
+      "day": "Wednesday",
+      "start": "19:55",
+      "duration": "20 min",
+      "facet": "CONDITIONING \u2014 Repeat Sprint and Contact",
+      "activity": "Short-space repeat sprint sets \u00b7 bag hits \u00b7 collision-to-sprint sequences \u00b7 work:rest ratio management",
+      "lead": "S&C Coach",
+      "assist": "All",
+      "priority": "IMPORTANT"
+    },
+    {
+      "type": "session",
+      "day": "Wednesday",
+      "start": "20:15",
+      "duration": "10 min",
+      "facet": "Recovery and Stretch",
+      "activity": "Foam roll \u00b7 static stretching \u00b7 hydration \u00b7 session debrief by S&C coach",
+      "lead": "S&C Coach",
+      "assist": "Physio",
+      "priority": "SUPP."
+    },
+    {
+      "type": "session",
+      "day": "Wednesday",
+      "start": "20:25",
+      "duration": "5 min",
+      "facet": "Coach Debrief \u2014 Tactical Reminder",
+      "activity": "Brief tactical reminder for Thursday. Confirm lineout calls. Confirm match plan key points",
+      "lead": "Head Coach",
+      "assist": "\u2014",
+      "priority": "SUPPORTING"
+    },
+    {
+      "type": "day",
+      "label": "THURSDAY  \u2014  FIELD SESSION 2  |  ATTACK \u00b7 SET PIECE \u00b7 KICKING \u00b7 SCENARIOS  (120 min)"
+    },
+    {
+      "type": "session",
+      "day": "Thursday",
+      "start": "18:00",
+      "duration": "15 min",
+      "facet": "Warm-Up \u2014 Passing and Movement",
+      "activity": "Catch-pass fluency \u00b7 short/long pass reps \u00b7 skip and flat pass \u00b7 catch under pressure \u00b7 SAQ gates",
+      "lead": "Backs Coach",
+      "assist": "All",
+      "priority": "SUPP."
+    },
+    {
+      "type": "session",
+      "day": "Thursday",
+      "start": "18:15",
+      "duration": "10 min",
+      "facet": "Touch Rugby \u2014 Shape Activation",
+      "activity": "Structured touch: enforce depth, width, and strike play calls. No aimless passing",
+      "lead": "Head Coach",
+      "assist": "All",
+      "priority": "SUPPORTING"
+    },
+    {
+      "type": "session",
+      "day": "Thursday",
+      "start": "18:25",
+      "duration": "5 min",
+      "facet": "Coach Chat \u2014 Opposition Brief",
+      "activity": "Key opponent tendencies: set-piece, kick patterns, defensive alignment. Set weekly game cues",
+      "lead": "Head Coach",
+      "assist": "All",
+      "priority": "SUPP."
+    },
+    {
+      "type": "session",
+      "day": "Thursday",
+      "start": "18:30",
+      "duration": "22 min",
+      "facet": "ATTACK SHAPE \u2014 Phase Play and Strike Plays",
+      "activity": "Shape reps off scrum and lineout \u00b7 M-plays \u00b7 bus/taxi pods \u00b7 strike play timing \u00b7 edge exploitation \u00b7 skip pass from 10",
+      "lead": "Head Coach",
+      "assist": "Backs Coach",
+      "priority": "CRITICAL"
+    },
+    {
+      "type": "session",
+      "day": "Thursday",
+      "start": "18:52",
+      "duration": "17 min",
+      "facet": "SET PIECE \u2014 Scrums and Lineouts",
+      "activity": "Tight-five scrum reps \u00b7 binding and timing \u00b7 lineout calling reps \u00b7 INDIA/JEKWA options \u00b7 maul setup and exit \u00b7 defensive lineout contest",
+      "lead": "Forwards Coach",
+      "assist": "Head Coach",
+      "priority": "CRITICAL"
+    },
+    {
+      "type": "session",
+      "day": "Thursday",
+      "start": "19:09",
+      "duration": "6 min",
+      "facet": "WATER BREAK",
+      "activity": "Hydration \u00b7 visual tactical board \u00b7 call confirmation",
+      "lead": "Manager",
+      "assist": "\u2014",
+      "priority": "SUPP."
+    },
+    {
+      "type": "session",
+      "day": "Thursday",
+      "start": "19:15",
+      "duration": "12 min",
+      "facet": "TACTICAL KICKING \u2014 Exit Systems and Kick Receipt",
+      "activity": "Exit structure reps \u00b7 box kick with chase pod \u00b7 kick receipt formation \u00b7 grubber and chip execution \u00b7 50/22 trigger recognition",
+      "lead": "Backs Coach",
+      "assist": "Head Coach",
+      "priority": "IMPORTANT"
+    },
+    {
+      "type": "session",
+      "day": "Thursday",
+      "start": "19:27",
+      "duration": "5 min",
+      "facet": "RESTARTS \u2014 Kickoff and Receipt",
+      "activity": "3-man pod receipt \u00b7 contestable kickoff structure \u00b7 exit shape \u00b7 chase alignment",
+      "lead": "Head Coach",
+      "assist": "All",
+      "priority": "SUPPORTING"
+    },
+    {
+      "type": "session",
+      "day": "Thursday",
+      "start": "19:32",
+      "duration": "10 min",
+      "facet": "RED ZONE \u2014 Attack and Defence",
+      "activity": "5-metre attack sequences \u00b7 pick-and-go vs power play \u00b7 goal line defence reps \u00b7 choke tackle attempt",
+      "lead": "Forwards Coach",
+      "assist": "Head Coach",
+      "priority": "IMPORTANT"
+    },
+    {
+      "type": "session",
+      "day": "Thursday",
+      "start": "19:42",
+      "duration": "12 min",
+      "facet": "SCENARIO TRAINING \u2014 Pressure Moments",
+      "activity": "One-score game \u00b7 chasing last 10 minutes \u00b7 14-man rugby \u00b7 wet-weather exit \u00b7 quick restart exploitation",
+      "lead": "Head Coach",
+      "assist": "All",
+      "priority": "SUPPORTING"
+    },
+    {
+      "type": "session",
+      "day": "Thursday",
+      "start": "19:54",
+      "duration": "6 min",
+      "facet": "Cool Down and Weekly Review",
+      "activity": "Brief collective debrief \u00b7 accountability call-out \u00b7 top performers acknowledged \u00b7 Friday plan confirmed",
+      "lead": "Head Coach",
+      "assist": "Captain",
+      "priority": "SUPP."
+    },
+    {
+      "type": "day",
+      "label": "FRIDAY  \u2014  CAPTAIN'S RUN  |  CLARITY SESSION  (45\u201360 min)"
+    },
+    {
+      "type": "session",
+      "day": "Friday",
+      "start": "18:00",
+      "duration": "15 min",
+      "facet": "Warm-Up \u2014 Light Activation",
+      "activity": "Light SAQ \u00b7 no contact \u00b7 muscle activation only \u00b7 mental sharpness focus",
+      "lead": "S&C Coach",
+      "assist": "All",
+      "priority": "SUPP."
+    },
+    {
+      "type": "session",
+      "day": "Friday",
+      "start": "18:15",
+      "duration": "10 min",
+      "facet": "DEFENCE \u2014 Walk-Through",
+      "activity": "Defensive call confirmation \u00b7 spacing walk \u00b7 fold system walk \u00b7 no live contact",
+      "lead": "Backs Coach",
+      "assist": "Head Coach",
+      "priority": "CRITICAL"
+    },
+    {
+      "type": "session",
+      "day": "Friday",
+      "start": "18:25",
+      "duration": "10 min",
+      "facet": "SET PIECE \u2014 Captain's Walk",
+      "activity": "Lineout call walk \u00b7 scrum sequence confirm \u00b7 restart pod walk",
+      "lead": "Forwards Coach",
+      "assist": "Captain",
+      "priority": "CRITICAL"
+    },
+    {
+      "type": "session",
+      "day": "Friday",
+      "start": "18:35",
+      "duration": "8 min",
+      "facet": "ATTACK \u2014 Strike Play Walk",
+      "activity": "Three key strike plays walked at half pace \u00b7 call words confirmed \u00b7 eye movement drilled",
+      "lead": "Head Coach",
+      "assist": "All",
+      "priority": "CRITICAL"
+    },
+    {
+      "type": "session",
+      "day": "Friday",
+      "start": "18:43",
+      "duration": "5 min",
+      "facet": "GAME MANAGEMENT \u2014 Scenario Triggers",
+      "activity": "Final trigger review: clock kill \u00b7 exit call \u00b7 14-man structure \u00b7 quick restart intent",
+      "lead": "Head Coach",
+      "assist": "Captain",
+      "priority": "SUPPORTING"
+    },
+    {
+      "type": "session",
+      "day": "Friday",
+      "start": "18:48",
+      "duration": "10 min",
+      "facet": "Team Talk \u2014 Pre-Match Activation",
+      "activity": "Opposition brief \u00b7 game model reminder \u00b7 season goal anchor \u00b7 identity statement \u00b7 captain's words",
+      "lead": "Head Coach",
+      "assist": "Captain",
+      "priority": "SUPP."
+    },
+    {
+      "type": "day",
+      "label": "SATURDAY  \u2014  MATCH DAY"
+    },
+    {
+      "type": "session",
+      "day": "Saturday",
+      "start": "H-120",
+      "duration": "45 min",
+      "facet": "Individual Pre-Match Prep",
+      "activity": "Personal activation \u00b7 mental prep \u00b7 nutrition and hydration \u00b7 jersey-on time",
+      "lead": "Player",
+      "assist": "Physio",
+      "priority": "SUPP."
+    },
+    {
+      "type": "session",
+      "day": "Saturday",
+      "start": "H-75",
+      "duration": "20 min",
+      "facet": "Forwards Warm-Up",
+      "activity": "Scrum engagement \u00b7 lineout lifts \u00b7 binding check \u00b7 contact activation",
+      "lead": "Forwards Coach",
+      "assist": "\u2014",
+      "priority": "CRITICAL"
+    },
+    {
+      "type": "session",
+      "day": "Saturday",
+      "start": "H-60",
+      "duration": "20 min",
+      "facet": "Backs Warm-Up",
+      "activity": "Passing reps \u00b7 kick receipt \u00b7 strike play run-through \u00b7 defensive trigger walk",
+      "lead": "Backs Coach",
+      "assist": "\u2014",
+      "priority": "CRITICAL"
+    },
+    {
+      "type": "session",
+      "day": "Saturday",
+      "start": "H-35",
+      "duration": "15 min",
+      "facet": "Full Team Warm-Up",
+      "activity": "Structured team run \u00b7 defensive walk \u00b7 restart walk \u00b7 final mental cues",
+      "lead": "Head Coach",
+      "assist": "All",
+      "priority": "SUPPORTING"
+    },
+    {
+      "type": "session",
+      "day": "Saturday",
+      "start": "H-15",
+      "duration": "10 min",
+      "facet": "Final Team Talk",
+      "activity": "Emotional activation \u00b7 identity anchor \u00b7 captain's call \u00b7 game model final word",
+      "lead": "Head Coach",
+      "assist": "Captain",
+      "priority": "SUPP."
+    },
+    {
+      "type": "session",
+      "day": "Saturday",
+      "start": "HT",
+      "duration": "15 min",
+      "facet": "Half-Time Tactical Reset",
+      "activity": "Performance data review \u00b7 tactical correction \u00b7 emotional reset \u00b7 re-motivation",
+      "lead": "Head Coach",
+      "assist": "All",
+      "priority": "IMPORTANT"
+    },
+    {
+      "type": "session",
+      "day": "Saturday",
+      "start": "FT",
+      "duration": "20 min",
+      "facet": "Post-Match Debrief",
+      "activity": "Result acknowledgement \u00b7 effort recognition \u00b7 key observations \u00b7 recovery plan",
+      "lead": "Head Coach",
+      "assist": "All",
+      "priority": "SUPP."
+    },
+    {
+      "type": "day",
+      "label": "SUNDAY  \u2014  RECOVERY \u00b7 ANALYSIS PREP"
+    },
+    {
+      "type": "session",
+      "day": "Sunday",
+      "start": "10:00",
+      "duration": "60 min",
+      "facet": "Active Recovery",
+      "activity": "Pool session or light walk \u00b7 static mobility \u00b7 cold therapy \u00b7 hydration loading",
+      "lead": "Physio",
+      "assist": "S&C Coach",
+      "priority": "SUPP."
+    },
+    {
+      "type": "session",
+      "day": "Sunday",
+      "start": "12:00",
+      "duration": "45 min",
+      "facet": "Coach Video Prep",
+      "activity": "Analyst pulls match clips: defence errors, breakdown speed, exit failures, set-piece outcomes",
+      "lead": "Analyst",
+      "assist": "Head Coach",
+      "priority": "SUPPORTING"
+    },
+    {
+      "type": "session",
+      "day": "Sunday",
+      "start": "14:00",
+      "duration": "30 min",
+      "facet": "Coaching Staff Meeting",
+      "activity": "Next week plan: what to fix, what to build, opposition analysis begins",
+      "lead": "Head Coach",
+      "assist": "All Coaches",
+      "priority": "SUPPORTING"
+    },
+    {
+      "type": "day",
+      "label": "\"The team that executes simple systems at extreme speed, physicality and accuracy usually beats the team with the most creative whiteboard.  The game punishes complexity under fatigue.  The purpose of weekly coaching is not to install more information \u2014 it is to reduce hesitation under pressure.\""
+    }
+  ],
+  "calendar": {
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August"
+    ],
+    "notes": [
+      "Pre-season foundation",
+      "Warm-up block",
+      "Competition entry",
+      "League campaign",
+      "Physical resilience",
+      "Mid-season reset",
+      "Pressure fixtures",
+      "Closeout and review"
+    ]
+  },
+  "teamSheet": {
+    "matchVs": "",
+    "venue": "",
+    "date": "",
+    "competition": "",
+    "starters": [
+      {
+        "no": 1,
+        "position": "Loosehead Prop"
+      },
+      {
+        "no": 2,
+        "position": "Hooker"
+      },
+      {
+        "no": 3,
+        "position": "Tighthead Prop"
+      },
+      {
+        "no": 4,
+        "position": "Lock"
+      },
+      {
+        "no": 5,
+        "position": "Lock"
+      },
+      {
+        "no": 6,
+        "position": "Blindside Flanker"
+      },
+      {
+        "no": 7,
+        "position": "Openside Flanker"
+      },
+      {
+        "no": 8,
+        "position": "Number 8"
+      },
+      {
+        "no": 9,
+        "position": "Scrumhalf"
+      },
+      {
+        "no": 10,
+        "position": "Flyhalf"
+      },
+      {
+        "no": 11,
+        "position": "Left Wing"
+      },
+      {
+        "no": 12,
+        "position": "Inside Centre"
+      },
+      {
+        "no": 13,
+        "position": "Outside Centre"
+      },
+      {
+        "no": 14,
+        "position": "Right Wing"
+      },
+      {
+        "no": 15,
+        "position": "Fullback"
+      }
+    ],
+    "bench": [
+      {
+        "no": 16,
+        "position": "Reserve Hooker"
+      },
+      {
+        "no": 17,
+        "position": "Reserve Prop"
+      },
+      {
+        "no": 18,
+        "position": "Reserve Prop"
+      },
+      {
+        "no": 19,
+        "position": "Reserve Lock"
+      },
+      {
+        "no": 20,
+        "position": "Reserve Loose Forward"
+      },
+      {
+        "no": 21,
+        "position": "Reserve Scrumhalf"
+      },
+      {
+        "no": 22,
+        "position": "Reserve Back"
+      },
+      {
+        "no": 23,
+        "position": "Utility Back"
+      }
+    ]
+  },
+  "ratingsTemplate": {
+    "matchVs": "",
+    "date": "",
+    "players": [
+      {
+        "no": 1,
+        "position": "Loosehead Prop"
+      },
+      {
+        "no": 2,
+        "position": "Hooker"
+      },
+      {
+        "no": 3,
+        "position": "Tighthead Prop"
+      },
+      {
+        "no": 4,
+        "position": "Lock"
+      },
+      {
+        "no": 5,
+        "position": "Lock"
+      },
+      {
+        "no": 6,
+        "position": "Blindside Flanker"
+      },
+      {
+        "no": 7,
+        "position": "Openside Flanker"
+      },
+      {
+        "no": 8,
+        "position": "Number 8"
+      },
+      {
+        "no": 9,
+        "position": "Scrumhalf"
+      },
+      {
+        "no": 10,
+        "position": "Flyhalf"
+      },
+      {
+        "no": 11,
+        "position": "Wing"
+      },
+      {
+        "no": 12,
+        "position": "Centre"
+      },
+      {
+        "no": 13,
+        "position": "Centre"
+      },
+      {
+        "no": 14,
+        "position": "Wing"
+      },
+      {
+        "no": 15,
+        "position": "Fullback"
+      }
+    ]
+  }
+}

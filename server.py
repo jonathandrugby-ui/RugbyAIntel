@@ -10,6 +10,7 @@ Usage:
 
 import os
 import json
+import socket
 import urllib.request
 import urllib.error
 from http.server import HTTPServer, SimpleHTTPRequestHandler
@@ -38,9 +39,9 @@ class Handler(SimpleHTTPRequestHandler):
         self.end_headers()
 
     def do_POST(self):
+        print(f"  → POST {self.path!r}")
         if self.path != "/api/messages":
-            self.send_response(404)
-            self.end_headers()
+            self._json_error(404, f"Unknown endpoint: {self.path!r}")
             return
 
         api_key = os.environ.get("ANTHROPIC_API_KEY", "")
@@ -116,7 +117,14 @@ if __name__ == "__main__":
     print(f"  → http://localhost:{PORT}")
     print()
 
-    server = HTTPServer(("", PORT), Handler)
+    # Dual-stack: bind to IPv6 wildcard; macOS accepts IPv4 connections too
+    class DualStackServer(HTTPServer):
+        address_family = socket.AF_INET6
+
+    try:
+        server = DualStackServer(("", PORT), Handler)
+    except OSError:
+        server = HTTPServer(("", PORT), Handler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
