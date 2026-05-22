@@ -16,6 +16,10 @@ const CRUMBS = {
   opponent:  <>Workspace / <b>Opponent Intel</b></>,
   video:     <>Workspace / <b>Video Clips</b></>,
   playbook:  <>Workspace / <b>Playbook</b></>,
+  setpiece:  <>Analytics / <b>Set Piece Trends</b></>,
+  kicking:   <>Analytics / <b>Kicking &amp; Territory</b></>,
+  workload:  <>Analytics / <b>Workload &amp; Fatigue</b></>,
+  breakdown: <>Analytics / <b>Collision &amp; Breakdown</b></>,
   analyst:   <>Assistant / <b>Analyst</b></>,
   onboarding:<>Setup / <b>New season</b></>,
 };
@@ -26,6 +30,17 @@ const App = () => {
     return u.searchParams.get('r') || 'dashboard';
   });
   const [focusPracticeDate, setFocusPracticeDate] = React.useState(null);
+
+  /* Sidebar open/closed — persisted in localStorage */
+  const [sidebarOpen, setSidebarOpen] = React.useState(() => {
+    try { return localStorage.getItem('rugbyai-sidebar') !== 'closed'; }
+    catch { return true; }
+  });
+  const toggleSidebar = () => setSidebarOpen(s => {
+    const next = !s;
+    try { localStorage.setItem('rugbyai-sidebar', next ? 'open' : 'closed'); } catch {}
+    return next;
+  });
 
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const store = usePractices();
@@ -45,10 +60,18 @@ const App = () => {
   const jumpToPractice = (iso) => { setFocusPracticeDate(iso); setRoute('practice'); };
 
   return (
-    <div className="app-shell" data-screen-label={`Mid-Fi · ${route}`}>
-      <Sidebar active={route} onNav={navTo} />
+    <div
+      className="app-shell"
+      data-screen-label={`Mid-Fi · ${route}`}
+      data-sidebar={sidebarOpen ? 'open' : 'closed'}
+    >
+      <Sidebar active={route} onNav={navTo} onCollapse={toggleSidebar} />
       <main className="main">
-        <TopBar crumb={CRUMBS[route]} />
+        <TopBar
+          crumb={CRUMBS[route]}
+          sidebarOpen={sidebarOpen}
+          onToggleSidebar={toggleSidebar}
+        />
         {route === 'dashboard'  && <Dashboard />}
         {route === 'squad'      && <Squad />}
         {route === 'match'      && <MatchDay />}
@@ -72,9 +95,16 @@ const App = () => {
         {route === 'opponent'   && <OpponentIntel />}
         {route === 'video'      && <VideoClips />}
         {route === 'playbook'   && <Playbook />}
+        {route === 'setpiece'   && <SetPieceTrends />}
+        {route === 'kicking'    && <KickingAnalytics />}
+        {route === 'workload'   && <WorkloadRisk />}
+        {route === 'breakdown'  && <BreakdownEfficiency />}
         {route === 'analyst'    && <Analyst />}
         {route === 'onboarding' && <Onboarding />}
       </main>
+
+      {/* Mobile bottom tab navigation */}
+      <MobileNav active={route} onNav={navTo} />
 
       {/* Floating AI chat widget — accessible from any screen */}
       <AIChat />
@@ -140,6 +170,10 @@ const App = () => {
           opponent: '◉ Opponent Intel',
           video: '▶ Video Clips',
           playbook: '☰ Playbook',
+          setpiece: '⬆ Set Piece Trends',
+          kicking: '◎ Kicking & Territory',
+          workload: '◑ Workload & Fatigue',
+          breakdown: '⊕ Breakdown',
           analyst: '✦ Analyst (AI)',
           onboarding: '✿ Onboarding',
         }).map(([k, label]) => (

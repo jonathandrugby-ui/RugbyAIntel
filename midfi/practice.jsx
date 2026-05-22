@@ -9,6 +9,18 @@ const PracticePlanner = ({ practices, addDrill, removeDrill, removePractice, res
   const [draggingDrill, setDraggingDrill] = React.useState(null);
   const [dropDate, setDropDate] = React.useState(null);
 
+  /* ── Drill library visibility ── */
+  const [libraryOpen, setLibraryOpen] = React.useState(false);
+
+  /* ── Session-level overrides (start time etc.) ── */
+  const [sessionOv, setSessionOv] = React.useState({});
+  const [editSess, setEditSess] = React.useState(null); // { iso, field }
+  const getSOv   = (iso, f, def) => sessionOv[iso]?.[f] ?? def;
+  const setSOv   = (iso, f, v) => setSessionOv(p => ({ ...p, [iso]: { ...(p[iso] || {}), [f]: v } }));
+  const isEdS    = (iso, f) => editSess?.iso === iso && editSess?.field === f;
+  const startEdS = (iso, f) => setEditSess({ iso, field: f });
+  const stopEdS  = () => setEditSess(null);
+
   /* ── Inline drill editing ── */
   const [drillOverrides, setDrillOverrides] = React.useState({});
   const [editCell, setEditCell] = React.useState(null); // { key: 'iso__idx', field }
@@ -214,70 +226,133 @@ const PracticePlanner = ({ practices, addDrill, removeDrill, removePractice, res
 
       <div className="planner">
         {/* ── Drill library ── */}
-        <div className="card" style={{ padding: 14, position: 'sticky', top: 'calc(var(--topbar-h) + 14px)', maxHeight: 'calc(100vh - var(--topbar-h) - 56px)', display: 'flex', flexDirection: 'column', gap: 0 }}>
-          <div className="row between" style={{ marginBottom: 10 }}>
-            <div className="card-title">Drill library</div>
-            <span className="mono">{allDrills.length} drills{customDrills.length > 0 ? ` · ${customDrills.length} custom` : ''}</span>
-          </div>
-          <input
-            className="input"
-            placeholder="Search name or description…"
-            value={drillQuery}
-            onChange={e => setDrillQuery(e.target.value)}
-            style={{ width: '100%', marginBottom: 8 }}
-          />
-          <div className="row gap-2 wrap" style={{ marginBottom: 10 }}>
-            <button className={`chip ${drillFilter === 'all' ? 'active' : ''}`} onClick={() => setDrillFilter('all')}>All</button>
-            {DRILL_CATS.map(c => (
-              <button key={c} className={`chip ${drillFilter === c ? 'active' : ''}`} onClick={() => setDrillFilter(c)}>{c}</button>
-            ))}
-          </div>
-          <div style={{ flex: 1, overflowY: 'auto', margin: '0 -4px', padding: '0 4px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {filteredDrills.map(d => {
-              const col = CAT_COLOR[d.cat];
-              const ic = intColors(d.intensity);
-              return (
-                <div
-                  key={d.id}
-                  className={`drill-card ${draggingDrill === d.id ? 'dragging' : ''}`}
-                  draggable
-                  onDragStart={onDrillDragStart(d.id)}
-                  onDragEnd={onDrillDragEnd}
-                  style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 6, padding: '10px 12px', cursor: 'grab' }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%' }}>
-                    <span className="cat-pill" style={{ background: col.bg, color: col.fg, flexShrink: 0 }}>{d.cat[0]}</span>
-                    <span style={{ flex: 1, fontWeight: 600, fontSize: 13 }}>{d.name}</span>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--ink-soft)', fontWeight: 600, flexShrink: 0 }}>{d.min}m</span>
-                    {d.custom && (
-                      <button
-                        onClick={e => { e.stopPropagation(); removeCustomDrill(d.id); }}
-                        style={{ background: 'transparent', border: 0, color: 'var(--muted)', cursor: 'pointer', fontSize: 14, padding: '0 2px', lineHeight: 1 }}
-                        title="Remove custom drill"
-                      >×</button>
-                    )}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 700, letterSpacing: '.06em', padding: '1px 5px', borderRadius: 3, background: 'var(--paper-2)', color: 'var(--ink-soft)', border: '1px solid var(--line)' }}>{groupLabel(d.group)}</span>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 700, letterSpacing: '.06em', padding: '1px 5px', borderRadius: 3, background: ic.bg, color: ic.fg }}>{d.intensity}</span>
-                    {d.focus && <span style={{ fontSize: 10, color: 'var(--ink-soft)', fontStyle: 'italic' }}>· {d.focus}</span>}
-                    {d.custom && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--accent-2)', fontWeight: 700, letterSpacing: '.06em', marginLeft: 2 }}>CUSTOM</span>}
-                  </div>
-                  {d.desc && <div style={{ fontSize: 11, color: 'var(--ink-soft)', lineHeight: 1.45 }}>{d.desc}</div>}
-                  {d.calls && d.calls.length > 0 && (
-                    <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-                      {d.calls.map(c => (
-                        <span key={c} style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 700, letterSpacing: '.06em', padding: '1px 5px', borderRadius: 3, background: 'rgba(24,43,84,.08)', color: 'var(--primary)', border: '1px solid rgba(24,43,84,.15)' }}>{c}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-            {filteredDrills.length === 0 && (
-              <div style={{ padding: 14, fontSize: 12, color: 'var(--muted)', textAlign: 'center', fontStyle: 'italic' }}>No drills match.</div>
+        <div className="card" style={{ padding: 0, position: 'sticky', top: 'calc(var(--topbar-h) + 14px)', maxHeight: libraryOpen ? 'calc(100vh - var(--topbar-h) - 56px)' : 'auto', display: 'flex', flexDirection: 'column', gap: 0, overflow: 'hidden' }}>
+
+          {/* ── Library header — always visible, click to toggle ── */}
+          <button
+            onClick={() => setLibraryOpen(o => !o)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '12px 14px',
+              background: libraryOpen ? 'var(--primary)' : 'var(--paper)',
+              border: 0, width: '100%', cursor: 'pointer', textAlign: 'left',
+              borderBottom: libraryOpen ? '1px solid rgba(255,255,255,.08)' : 0,
+              transition: 'background .15s',
+            }}
+          >
+            <span style={{ fontSize: 15, color: libraryOpen ? 'var(--accent)' : 'var(--primary)', lineHeight: 1 }}>
+              {libraryOpen ? '▾' : '▸'}
+            </span>
+            <span style={{
+              fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 14,
+              color: libraryOpen ? 'var(--paper)' : 'var(--ink)',
+              flex: 1,
+            }}>Drill library</span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, color: libraryOpen ? 'rgba(255,255,255,.5)' : 'var(--muted)', letterSpacing: '.04em' }}>
+              {allDrills.length} drills{customDrills.length > 0 ? ` · ${customDrills.length} custom` : ''}
+            </span>
+            {/* Category colour swatches — visible when closed */}
+            {!libraryOpen && (
+              <div style={{ display: 'flex', gap: 3, marginLeft: 4 }}>
+                {DRILL_CATS.map(c => (
+                  <div key={c} style={{ width: 8, height: 8, borderRadius: 2, background: CAT_COLOR[c]?.border || '#ccc' }} />
+                ))}
+              </div>
             )}
-          </div>
+          </button>
+
+          {/* ── Library body — only when open ── */}
+          {libraryOpen && (
+            <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 0, flex: 1, overflow: 'hidden' }}>
+              <input
+                className="input"
+                placeholder="Search name or description…"
+                value={drillQuery}
+                onChange={e => setDrillQuery(e.target.value)}
+                style={{ width: '100%', marginBottom: 8 }}
+              />
+              {/* Category filter chips with colour dots */}
+              <div className="row gap-2 wrap" style={{ marginBottom: 10 }}>
+                <button className={`chip ${drillFilter === 'all' ? 'active' : ''}`} onClick={() => setDrillFilter('all')}>All</button>
+                {DRILL_CATS.map(c => {
+                  const cc = CAT_COLOR[c];
+                  return (
+                    <button
+                      key={c}
+                      className={`chip ${drillFilter === c ? 'active' : ''}`}
+                      onClick={() => setDrillFilter(c)}
+                      style={drillFilter === c ? { background: cc.border, color: '#fff', borderColor: cc.border } : {}}
+                    >
+                      <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: cc.border, marginRight: 4, verticalAlign: 'middle', flexShrink: 0 }} />
+                      {c}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Drill cards */}
+              <div style={{ flex: 1, overflowY: 'auto', margin: '0 -4px', padding: '0 4px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+                {filteredDrills.map(d => {
+                  const col = CAT_COLOR[d.cat] || CAT_COLOR['Skills'];
+                  const ic = intColors(d.intensity);
+                  return (
+                    <div
+                      key={d.id}
+                      className={`drill-card ${draggingDrill === d.id ? 'dragging' : ''}`}
+                      draggable
+                      onDragStart={onDrillDragStart(d.id)}
+                      onDragEnd={onDrillDragEnd}
+                      style={{
+                        flexDirection: 'column', alignItems: 'flex-start', gap: 5,
+                        padding: '9px 11px 9px 14px',
+                        cursor: 'grab',
+                        background: col.bg,
+                        borderLeft: `3px solid ${col.border}`,
+                        borderRadius: '0 7px 7px 0',
+                        border: `1px solid rgba(0,0,0,.06)`,
+                        borderLeftWidth: 3,
+                        borderLeftColor: col.border,
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%' }}>
+                        <span style={{
+                          fontFamily: 'var(--font-mono)', fontSize: 8, fontWeight: 800,
+                          letterSpacing: '.08em', padding: '2px 5px', borderRadius: 3,
+                          background: col.border, color: '#fff', flexShrink: 0,
+                        }}>{d.cat.split(' ')[0].toUpperCase()}</span>
+                        <span style={{ flex: 1, fontWeight: 700, fontSize: 13, color: 'var(--ink)' }}>{d.name}</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: col.fg, fontWeight: 700, flexShrink: 0 }}>{d.min}m</span>
+                        {d.custom && (
+                          <button
+                            onClick={e => { e.stopPropagation(); removeCustomDrill(d.id); }}
+                            style={{ background: 'transparent', border: 0, color: 'var(--muted)', cursor: 'pointer', fontSize: 14, padding: '0 2px', lineHeight: 1 }}
+                            title="Remove custom drill"
+                          >×</button>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 700, letterSpacing: '.06em', padding: '1px 5px', borderRadius: 3, background: 'rgba(255,255,255,.6)', color: 'var(--ink-soft)', border: '1px solid rgba(0,0,0,.08)' }}>{groupLabel(d.group)}</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 700, letterSpacing: '.06em', padding: '1px 5px', borderRadius: 3, background: ic.bg, color: ic.fg }}>{d.intensity}</span>
+                        {d.focus && <span style={{ fontSize: 10, color: 'var(--ink-soft)', fontStyle: 'italic' }}>· {d.focus}</span>}
+                        {d.custom && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--accent-2)', fontWeight: 700, letterSpacing: '.06em', marginLeft: 2 }}>CUSTOM</span>}
+                      </div>
+                      {d.desc && <div style={{ fontSize: 11, color: 'var(--ink-soft)', lineHeight: 1.4 }}>{d.desc}</div>}
+                      {d.calls && d.calls.length > 0 && (
+                        <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+                          {d.calls.map(c => (
+                            <span key={c} style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 700, letterSpacing: '.06em', padding: '1px 5px', borderRadius: 3, background: 'rgba(255,255,255,.7)', color: col.fg, border: `1px solid ${col.border}40` }}>{c}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                {filteredDrills.length === 0 && (
+                  <div style={{ padding: 14, fontSize: 12, color: 'var(--muted)', textAlign: 'center', fontStyle: 'italic' }}>No drills match.</div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ── Right column ── */}
@@ -299,7 +374,7 @@ const PracticePlanner = ({ practices, addDrill, removeDrill, removePractice, res
                 /* Start time uses overridden durations for preceding drills */
                 const prevMins = session.drills.slice(0, idx).reduce((a, pid, pidx) =>
                   a + Number(getOv(iso, pidx, 'min', drillById[pid]?.min || 0)), 0);
-                const [sh, sm] = session.start.split(':').map(Number);
+                const [sh, sm] = getSOv(iso, 'start', session.start).split(':').map(Number);
                 const tot = sh * 60 + sm + prevMins;
                 const startTime = `${Math.floor(tot / 60)}:${String(tot % 60).padStart(2, '0')}`;
 
@@ -341,23 +416,60 @@ const PracticePlanner = ({ practices, addDrill, removeDrill, removePractice, res
                   onDrop={onDayDrop(iso)}
                 >
                   {/* Day header */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 14px', borderBottom: session || isMatch ? '1px solid var(--line)' : 'none', background: isToday ? 'rgba(201,148,30,.05)' : undefined }}>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 11, letterSpacing: '.08em', minWidth: 54, color: isMatch ? 'var(--accent)' : isToday ? 'var(--accent-2)' : 'var(--primary)' }}>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
+                    borderBottom: session || isMatch ? '1px solid var(--line)' : 'none',
+                    background: session
+                      ? 'var(--primary)'
+                      : isMatch ? 'rgba(201,148,30,.08)' : undefined,
+                  }}>
+                    {/* Day stamp */}
+                    <span style={{
+                      fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: 12,
+                      letterSpacing: '.1em', minWidth: 54,
+                      color: session ? 'var(--accent)' : isMatch ? 'var(--accent)' : 'var(--primary)',
+                    }}>
                       {DAY_NAMES_SHORT[dow].toUpperCase()} {d}
                     </span>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--muted)', minWidth: 80 }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: session ? 'rgba(255,255,255,.45)' : 'var(--muted)', minWidth: 56 }}>
                       {MONTH_NAMES_SHORT[m]} {d}{isToday ? ' · TODAY' : ''}
                     </span>
-                    <span style={{ width: 1, height: 16, background: 'var(--line)', flexShrink: 0 }} />
+                    <span style={{ width: 1, height: 16, background: session ? 'rgba(255,255,255,.14)' : 'var(--line)', flexShrink: 0 }} />
+
                     {session ? (
                       <>
+                        {/* Session title — editable */}
                         <input
                           className="input"
                           defaultValue={session.focus.toUpperCase()}
-                          style={{ padding: '1px 4px', fontSize: 11, fontWeight: 700, letterSpacing: '.05em', border: 0, background: 'transparent', flex: 1 }}
+                          style={{
+                            padding: '2px 6px', fontSize: 13, fontWeight: 800,
+                            letterSpacing: '.06em', border: 0,
+                            background: 'rgba(255,255,255,.08)',
+                            color: 'var(--paper)', borderRadius: 4, flex: 1,
+                          }}
                         />
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--ink-soft)', whiteSpace: 'nowrap' }}>
-                          {session.start}–{session.end} · <b>{totalMinsDay}min</b>
+                        {/* Start time — click to edit */}
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'rgba(255,255,255,.65)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4 }}>
+                          {isEdS(iso, 'start') ? (
+                            <input
+                              autoFocus type="time"
+                              defaultValue={getSOv(iso, 'start', session.start)}
+                              style={{ ...inlineInput(), width: 82, fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700 }}
+                              onBlur={e => { setSOv(iso, 'start', e.target.value || session.start); stopEdS(); }}
+                              onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'Escape') stopEdS(); }}
+                            />
+                          ) : (
+                            <EditHint
+                              mono onClick={() => startEdS(iso, 'start')}
+                              title="Click to edit start time"
+                              style={{ color: 'var(--accent)', fontWeight: 700, fontSize: 11 }}
+                            >
+                              {getSOv(iso, 'start', session.start)}
+                            </EditHint>
+                          )}
+                          <span style={{ color: 'rgba(255,255,255,.45)' }}>–{session.end} · </span>
+                          <b style={{ color: 'var(--paper)' }}>{totalMinsDay}min</b>
                         </span>
                       </>
                     ) : isMatch ? (
@@ -374,22 +486,22 @@ const PracticePlanner = ({ practices, addDrill, removeDrill, removePractice, res
                     )}
                     <div style={{ flex: 1 }} />
                     {session && (
-                      <button onClick={() => removePractice(iso)} style={{ background: 'transparent', border: 0, color: 'var(--muted)', cursor: 'pointer', fontSize: 14, padding: '0 2px', lineHeight: 1 }} title="Remove session">×</button>
+                      <button onClick={() => removePractice(iso)} style={{ background: 'rgba(255,255,255,.08)', border: 0, color: 'rgba(255,255,255,.5)', cursor: 'pointer', fontSize: 14, padding: '1px 6px', lineHeight: 1, borderRadius: 4 }} title="Remove session">×</button>
                     )}
                   </div>
 
                   {/* ── Editable drill table ── */}
                   {session && drillRows.length > 0 && (
                     <table className="table" style={{ margin: 0, borderRadius: 0 }}>
-                      <thead>
+                      <thead style={{ background: 'rgba(24,43,84,.06)' }}>
                         <tr>
-                          <th style={{ width: 52 }}>Start</th>
-                          <th style={{ width: 56 }}>Dur.</th>
-                          <th style={{ width: 154 }}>Facet · Focus</th>
-                          <th>Drill / Activity</th>
-                          <th style={{ width: 102 }}>Lead</th>
-                          <th style={{ width: 102 }}>Assist</th>
-                          <th style={{ width: 72 }}>Priority</th>
+                          <th style={{ width: 52, color: 'var(--primary)', fontWeight: 800 }}>Start</th>
+                          <th style={{ width: 56, color: 'var(--primary)', fontWeight: 800 }}>Dur.</th>
+                          <th style={{ width: 154, color: 'var(--primary)', fontWeight: 800 }}>Facet · Focus</th>
+                          <th style={{ color: 'var(--primary)', fontWeight: 800 }}>Drill / Activity</th>
+                          <th style={{ width: 102, color: 'var(--primary)', fontWeight: 800 }}>Lead</th>
+                          <th style={{ width: 102, color: 'var(--primary)', fontWeight: 800 }}>Assist</th>
+                          <th style={{ width: 72, color: 'var(--primary)', fontWeight: 800 }}>Priority</th>
                           <th style={{ width: 24 }}></th>
                         </tr>
                       </thead>

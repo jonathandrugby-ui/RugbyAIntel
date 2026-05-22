@@ -126,8 +126,7 @@ h3 { font-size: 17px; line-height: 1.25; }
 
 /* --- Layout ---  */
 .app-shell {
-  display: grid;
-  grid-template-columns: var(--sidebar-w) 1fr;
+  display: flex;
   min-height: 100vh;
 }
 .sidebar {
@@ -136,8 +135,18 @@ h3 { font-size: 17px; line-height: 1.25; }
   padding: 16px 12px;
   display: flex; flex-direction: column; gap: 4px;
   position: sticky; top: 0; height: 100vh;
-  overflow-y: auto;
+  overflow: hidden;
   border-right: 1px solid rgba(255,255,255,.06);
+  /* Collapse / expand */
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  transition: width .22s cubic-bezier(.4,0,.2,1);
+}
+/* Collapsed state */
+.app-shell[data-sidebar="closed"] .sidebar {
+  width: 0;
+  padding: 0;
+  border-right-width: 0;
 }
 .brand {
   display: flex; align-items: center; gap: 10px;
@@ -208,7 +217,33 @@ h3 { font-size: 17px; line-height: 1.25; }
 }
 
 /* Main content */
-.main { display: flex; flex-direction: column; min-width: 0; }
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+/* Sidebar collapse button (desktop only) */
+.sidebar-collapse-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: transparent; border: none;
+  color: rgba(255,255,255,.38);
+  font: inherit; font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 4px;
+  flex-shrink: 0;
+  transition: background .12s, color .12s;
+  white-space: nowrap;
+}
+.sidebar-collapse-btn:hover {
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.75);
+}
+
+/* Topbar sidebar-open toggle */
+.topbar-toggle-btn {
+  flex-shrink: 0;
+  margin-right: 2px;
+}
 .topbar {
   height: var(--topbar-h);
   border-bottom: 1px solid var(--line);
@@ -1229,4 +1264,155 @@ body::before {
 .week-summary .stat-mini .val {
   font-family: var(--font-display); font-size: 24px; font-weight: 600;
   font-feature-settings: 'tnum';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE  ≤ 768px
+   Strategy: sidebar → hidden; bottom tab nav; single-column layouts
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Bottom nav hidden by default (desktop) */
+.mobile-nav { display: none; }
+
+@media (max-width: 768px) {
+
+  /* ── Shell ───────────────────────────────────────────────── */
+  .sidebar { display: none !important; }
+  .main { padding-bottom: 0; }
+  .sidebar-collapse-btn { display: none; }
+  .topbar-toggle-btn { display: none; }
+
+  /* ── Topbar ──────────────────────────────────────────────── */
+  .topbar {
+    padding: 0 14px;
+    gap: 8px;
+    height: 52px;
+  }
+  .crumb {
+    font-size: 10px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    max-width: 160px;
+  }
+  .search { display: none; }
+
+  /* ── Page content ────────────────────────────────────────── */
+  .page { padding: 14px 14px 80px; }
+
+  /* ── Typography ──────────────────────────────────────────── */
+  h1 { font-size: 24px !important; letter-spacing: -0.02em; }
+  h2 { font-size: 17px; }
+  .page-head { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .page-head .row { flex-wrap: wrap; gap: 8px; }
+
+  /* ── All split/grid layouts → single column ──────────────── */
+  .split.two,
+  .split.three,
+  .split.match,
+  .split.dash,
+  .split.analyst {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ── Stats & cards ───────────────────────────────────────── */
+  .stat .value { font-size: 28px; }
+  .week-summary { grid-template-columns: 1fr 1fr; }
+  .card { padding: 14px; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+
+  /* ── Tables: horizontal scroll wrapper ───────────────────── */
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--r-md); }
+  .table { min-width: 520px; }
+
+  /* ── Toolbar & filter chips: scroll instead of wrap ─────── */
+  .toolbar {
+    flex-wrap: nowrap; overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    gap: 6px;
+  }
+  .toolbar::-webkit-scrollbar { display: none; }
+  .chip { flex-shrink: 0; }
+  .modebar { overflow-x: auto; width: 100%; }
+  .modebar::-webkit-scrollbar { display: none; }
+  .modebar button { white-space: nowrap; flex-shrink: 0; }
+  /* Chip filter rows → scroll instead of wrap on mobile */
+  .row.wrap { flex-wrap: nowrap !important; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .row.wrap::-webkit-scrollbar { display: none; }
+
+  /* ── Live match banner ───────────────────────────────────── */
+  .live-banner {
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+  .live-banner .score { font-size: 36px; }
+  .live-banner .clock { font-size: 14px; padding: 4px 10px; }
+
+  /* ── Calendar ────────────────────────────────────────────── */
+  .cal-season { grid-template-columns: 1fr 1fr; }
+  .cal-list-item { grid-template-columns: 52px 70px 1fr; }
+  .cal-list-item > :nth-child(4),
+  .cal-list-item > :nth-child(5) { display: none; }
+
+  /* ── Practice planner ────────────────────────────────────── */
+  .planner { grid-template-columns: 1fr; }
+  .week-grid { grid-template-columns: 1fr 1fr; }
+
+  /* ── Onboarding steps: horizontal scroll ─────────────────── */
+  .onb-shell { padding: 20px 14px 80px; }
+  .onb-steps { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+  .onb-steps::-webkit-scrollbar { display: none; }
+  .onb-step { flex-shrink: 0; min-width: 120px; padding: 10px; }
+  .onb-step .lbl { font-size: 11px; }
+  .onb-card { padding: 20px 16px; }
+  .onb-card h2 { font-size: 22px; }
+
+  /* ── Pitch / match-day ───────────────────────────────────── */
+  .xv-list { grid-template-columns: 44px 1fr 1fr 34px; }
+  .xv-list > .h:nth-child(3),
+  .xv-list > .c:nth-child(3) { display: none; }
+
+  /* ── AI chat widget: lift above bottom nav ───────────────── */
+  .aichat-float-btn { bottom: 72px !important; }
+  .aichat-panel-wrap { bottom: 134px !important; max-height: calc(100vh - 160px) !important; }
+
+  /* ── Bottom tab nav ──────────────────────────────────────── */
+  .mobile-nav {
+    display: flex;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 56px;
+    background: var(--primary);
+    border-top: 1px solid rgba(255,255,255,.10);
+    z-index: 500;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    box-shadow: 0 -2px 16px rgba(0,0,0,.18);
+  }
+  .mobile-tab {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px;
+    background: transparent; border: none;
+    color: rgba(255,255,255,.5);
+    font-family: var(--font-body); font-size: 9px; font-weight: 500;
+    cursor: pointer; padding: 5px 2px;
+    transition: color .12s;
+    -webkit-tap-highlight-color: transparent;
+    letter-spacing: 0.01em;
+  }
+  .mobile-tab .tab-icon {
+    font-size: 18px; line-height: 1;
+    transition: transform .12s;
+  }
+  .mobile-tab.active { color: var(--accent); }
+  .mobile-tab.active .tab-icon { transform: scale(1.15); }
+  .mobile-tab.accent-tab.active { color: var(--accent); }
+}
+
+/* Very small phones */
+@media (max-width: 420px) {
+  .cal-season { grid-template-columns: 1fr; }
+  .week-summary { grid-template-columns: 1fr 1fr; }
+  .week-grid { grid-template-columns: 1fr; }
+  .live-banner .score { font-size: 28px; }
+  h1 { font-size: 22px !important; }
 }

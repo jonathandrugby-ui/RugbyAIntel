@@ -164,13 +164,13 @@ const DRILL_BY_ID = Object.fromEntries(DRILL_LIBRARY.map(d => [d.id, d]));
 /* Categories used for filtering + chip colours */
 const DRILL_CATS = ['Skills', 'Set Piece', 'Attack', 'Defence', 'Game Sim', 'Fitness', 'Recovery'];
 const CAT_COLOR = {
-  'Skills':   { bg: 'var(--paper-2)', fg: 'var(--ink)' },
-  'Set Piece':{ bg: 'rgba(201,148,30,.18)', fg: 'var(--accent-2)' },
-  'Attack':   { bg: 'rgba(46,122,69,.14)', fg: 'var(--ok)' },
-  'Defence':  { bg: 'rgba(24,43,84,.10)', fg: 'var(--primary)' },
-  'Game Sim': { bg: 'rgba(184,65,45,.10)', fg: 'var(--warn)' },
-  'Fitness':  { bg: 'rgba(0,0,0,.06)', fg: 'var(--ink)' },
-  'Recovery': { bg: 'rgba(20,80,120,.10)', fg: '#1d3f5e' },
+  'Skills':   { bg: 'rgba(99,102,241,.09)',  fg: '#4338ca', border: '#6366f1' },
+  'Set Piece':{ bg: 'rgba(201,148,30,.16)',  fg: '#92650a', border: '#c9941e' },
+  'Attack':   { bg: 'rgba(22,163,74,.13)',   fg: '#15803d', border: '#22c55e' },
+  'Defence':  { bg: 'rgba(24,43,84,.11)',    fg: '#182b54', border: '#3b82f6' },
+  'Game Sim': { bg: 'rgba(220,38,38,.11)',   fg: '#b91c1c', border: '#ef4444' },
+  'Fitness':  { bg: 'rgba(217,119,6,.12)',   fg: '#92400e', border: '#f59e0b' },
+  'Recovery': { bg: 'rgba(14,165,233,.11)',  fg: '#0369a1', border: '#38bdf8' },
 };
 
 /* ---- Seed practices ---- */

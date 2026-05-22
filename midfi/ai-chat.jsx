@@ -148,7 +148,7 @@ const AIChat = () => {
     <>
       {/* ── Chat panel ─────────────────────────────── */}
       {open && (
-        <div style={{
+        <div className="aichat-panel-wrap" style={{
           position: 'fixed', bottom: 82, right: 20, width: 368, height: 508,
           background: 'var(--chalk)', borderRadius: 18,
           boxShadow: '0 12px 48px rgba(0,0,0,.22), 0 2px 8px rgba(0,0,0,.10)',
@@ -315,6 +315,7 @@ const AIChat = () => {
 
       {/* ── Floating button ─────────────────────────── */}
       <button
+        className="aichat-float-btn"
         onClick={() => setOpen(o => !o)}
         style={{
           position: 'fixed', bottom: 20, right: 20,

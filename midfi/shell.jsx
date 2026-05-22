@@ -20,7 +20,7 @@ const SQUAD = [
   { n: 16, fn: 'Pierre',   ln: 'Petersen',       pos: '8th Man',         status: 'Committed', fit: 'Good',    contract: true,  caps: 119, phone: true },
   { n: 17, fn: 'Stefan',   ln: 'Mtawana',        pos: 'Outside Centre',  status: 'Committed', fit: 'Good',    contract: false, caps: 78,  phone: true },
   { n: 18, fn: 'Devon',    ln: 'Adams',          pos: 'Inside Centre',   status: 'Committed', fit: 'Good',    contract: true,  caps: 81,  phone: true },
-  { n: 19, fn: 'Tafadzwa', ln: 'Moyo',           pos: 'Lock',            status: 'Unknown',   fit: 'Recovering', contract: false, caps: 38,  phone: false },
+  { n: 19, fn: 'Tafadzwa', ln: 'Moyo',           pos: 'Lock',            status: 'Unknown',   fit: 'Recovering', contract: false, caps: 38, phone: false },
   { n: 20, fn: 'Sipho',    ln: 'Nkosi',          pos: 'Prop',            status: 'Committed', fit: 'Good',    contract: false, caps: 67,  phone: true },
   { n: 21, fn: 'Jordy',    ln: 'van Wyk',        pos: 'Fullback',        status: 'Committed', fit: 'Good',    contract: true,  caps: 91,  phone: true },
   { n: 22, fn: 'Tinashe',  ln: 'Chideya',        pos: 'Wing',            status: 'Committed', fit: 'Good',    contract: false, caps: 44,  phone: true },
@@ -59,12 +59,16 @@ const ROUTES = [
   { id: 'opponent',  label: 'Opponent Intel', icon: '◉', section: 'main' },
   { id: 'video',     label: 'Video',      icon: '▶', section: 'main' },
   { id: 'playbook',  label: 'Playbook',   icon: '☰', section: 'main' },
+  { id: 'setpiece',  label: 'Set Piece Trends',   icon: '⬆', section: 'analytics' },
+  { id: 'kicking',   label: 'Kicking & Territory', icon: '◎', section: 'analytics' },
+  { id: 'workload',  label: 'Workload & Fatigue',  icon: '◑', section: 'analytics' },
+  { id: 'breakdown', label: 'Breakdown',           icon: '⊕', section: 'analytics' },
   { id: 'analyst',   label: 'Analyst',    icon: '✦', section: 'ai', accent: true },
   { id: 'onboarding',label: 'Season setup', icon: '✚', section: 'admin' },
 ];
 
 /* ---- Components ---- */
-const Sidebar = ({ active, onNav }) => (
+const Sidebar = ({ active, onNav, onCollapse }) => (
   <aside className="sidebar">
     <div className="brand">
       <div className="brand-mark">R</div>
@@ -84,6 +88,18 @@ const Sidebar = ({ active, onNav }) => (
         <span className="nav-icon">{r.icon}</span>
         <span>{r.label}</span>
         {r.count !== undefined && <span className="nav-count">{r.count}</span>}
+      </div>
+    ))}
+
+    <div className="nav-section">Analytics</div>
+    {ROUTES.filter(r => r.section === 'analytics').map(r => (
+      <div
+        key={r.id}
+        className={`nav-item ${active === r.id ? 'active' : ''}`}
+        onClick={() => onNav(r.id)}
+      >
+        <span className="nav-icon">{r.icon}</span>
+        <span>{r.label}</span>
       </div>
     ))}
 
@@ -118,11 +134,24 @@ const Sidebar = ({ active, onNav }) => (
         <div style={{ fontSize: 11, color: 'rgba(255,255,255,.55)' }}>Head Coach</div>
       </div>
     </div>
+
+    <button className="sidebar-collapse-btn" onClick={onCollapse} title="Collapse sidebar">
+      <span style={{ fontSize: 18, lineHeight: 1, marginLeft: -2 }}>‹</span>
+      <span>Collapse</span>
+    </button>
   </aside>
 );
 
-const TopBar = ({ crumb, right }) => (
+const TopBar = ({ crumb, right, sidebarOpen, onToggleSidebar }) => (
   <header className="topbar">
+    <button
+      className="btn ghost sm topbar-toggle-btn"
+      onClick={onToggleSidebar}
+      title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+      style={{ fontSize: 16, padding: '0 8px', letterSpacing: 0 }}
+    >
+      {sidebarOpen ? '‹' : '›'}
+    </button>
     <div className="crumb">{crumb}</div>
     <div className="grow" />
     <div className="search">
@@ -138,6 +167,106 @@ const TopBar = ({ crumb, right }) => (
     )}
   </header>
 );
+
+/* ---- Mobile bottom tab navigation ---- */
+const MOBILE_TABS = [
+  { id: 'dashboard', icon: '◆', label: 'Season' },
+  { id: 'squad',     icon: '◇', label: 'Squad' },
+  { id: 'match',     icon: '▣', label: 'Match' },
+  { id: 'analyst',   icon: '✦', label: 'Analyst', accent: true },
+];
+
+const MobileNav = ({ active, onNav }) => {
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const moreRoutes = ROUTES.filter(r => !MOBILE_TABS.find(t => t.id === r.id));
+  const moreActive = moreRoutes.some(r => r.id === active);
+
+  return (
+    <>
+      {/* Slide-up drawer for remaining routes */}
+      {drawerOpen && (
+        <div
+          onClick={() => setDrawerOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 8000,
+            background: 'rgba(0,0,0,.45)',
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              position: 'absolute', bottom: 56, left: 0, right: 0,
+              background: 'var(--primary)',
+              borderRadius: '18px 18px 0 0',
+              padding: '10px 0 12px',
+              boxShadow: '0 -8px 30px rgba(0,0,0,.25)',
+              animation: 'mob-drawer-rise .2s cubic-bezier(.22,.68,0,1.2) both',
+            }}
+          >
+            {/* Drag handle */}
+            <div style={{
+              width: 36, height: 4, borderRadius: 2,
+              background: 'rgba(255,255,255,.2)',
+              margin: '0 auto 14px',
+            }} />
+            {moreRoutes.map(r => (
+              <div
+                key={r.id}
+                className={`nav-item ${active === r.id ? 'active' : ''}`}
+                style={{ margin: '0 10px', borderRadius: 8 }}
+                onClick={() => { onNav(r.id); setDrawerOpen(false); }}
+              >
+                <span className="nav-icon">{r.icon}</span>
+                <span>{r.label}</span>
+              </div>
+            ))}
+            {/* Coach footer inside drawer */}
+            <div style={{
+              margin: '12px 12px 0',
+              paddingTop: 12,
+              borderTop: '1px solid rgba(255,255,255,.08)',
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <div className="avatar" style={{ width: 28, height: 28, fontSize: 11 }}>CL</div>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--paper)' }}>Coach Louw</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,.5)' }}>Head Coach</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bottom tab bar */}
+      <nav className="mobile-nav">
+        {MOBILE_TABS.map(tab => (
+          <button
+            key={tab.id}
+            className={`mobile-tab ${active === tab.id ? 'active' : ''} ${tab.accent ? 'accent-tab' : ''}`}
+            onClick={() => onNav(tab.id)}
+          >
+            <span className="tab-icon">{tab.icon}</span>
+            <span>{tab.label}</span>
+          </button>
+        ))}
+        <button
+          className={`mobile-tab ${moreActive || drawerOpen ? 'active' : ''}`}
+          onClick={() => setDrawerOpen(s => !s)}
+        >
+          <span className="tab-icon">☰</span>
+          <span>More</span>
+        </button>
+      </nav>
+
+      <style>{`
+        @keyframes mob-drawer-rise {
+          from { transform: translateY(24px); opacity: 0; }
+          to   { transform: translateY(0);    opacity: 1; }
+        }
+      `}</style>
+    </>
+  );
+};
 
 /* Initial of a player for the head avatar */
 const initials = (p) => `${p.fn[0]}${p.ln[0]}`;
@@ -202,6 +331,6 @@ const Head = ({ p, size }) => (
 
 Object.assign(window, {
   SQUAD, FIXTURES, ROUTES,
-  Sidebar, TopBar,
+  Sidebar, TopBar, MobileNav,
   Sparkline, FormChart, Badge, Status, Head, initials,
 });
