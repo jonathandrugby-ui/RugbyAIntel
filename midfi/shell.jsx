@@ -59,6 +59,7 @@ const ROUTES = [
   { id: 'opponent',  label: 'Opponent Intel', icon: '◉', section: 'main' },
   { id: 'video',     label: 'Video',      icon: '▶', section: 'main' },
   { id: 'playbook',  label: 'Playbook',   icon: '☰', section: 'main' },
+  { id: 'tactical',  label: 'Tactical Intel',      icon: '◈', section: 'analytics', accent: true },
   { id: 'setpiece',  label: 'Set Piece Trends',   icon: '⬆', section: 'analytics' },
   { id: 'kicking',   label: 'Kicking & Territory', icon: '◎', section: 'analytics' },
   { id: 'workload',  label: 'Workload & Fatigue',  icon: '◑', section: 'analytics' },

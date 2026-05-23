@@ -16,6 +16,7 @@ const CRUMBS = {
   opponent:  <>Workspace / <b>Opponent Intel</b></>,
   video:     <>Workspace / <b>Video Clips</b></>,
   playbook:  <>Workspace / <b>Playbook</b></>,
+  tactical:  <>Analytics / <b>Tactical Intelligence</b></>,
   setpiece:  <>Analytics / <b>Set Piece Trends</b></>,
   kicking:   <>Analytics / <b>Kicking &amp; Territory</b></>,
   workload:  <>Analytics / <b>Workload &amp; Fatigue</b></>,
@@ -95,6 +96,7 @@ const App = () => {
         {route === 'opponent'   && <OpponentIntel />}
         {route === 'video'      && <VideoClips />}
         {route === 'playbook'   && <Playbook />}
+        {route === 'tactical'   && <TacticalIntelligence />}
         {route === 'setpiece'   && <SetPieceTrends />}
         {route === 'kicking'    && <KickingAnalytics />}
         {route === 'workload'   && <WorkloadRisk />}
@@ -170,6 +172,7 @@ const App = () => {
           opponent: '◉ Opponent Intel',
           video: '▶ Video Clips',
           playbook: '☰ Playbook',
+          tactical: '◈ Tactical Intel',
           setpiece: '⬆ Set Piece Trends',
           kicking: '◎ Kicking & Territory',
           workload: '◑ Workload & Fatigue',
