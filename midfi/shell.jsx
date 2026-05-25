@@ -1,53 +1,63 @@
 /* RugbyAI mid-fi — Shell components and shared data */
 
-/* ---- Real Pumas RFC data extracted from the spreadsheet ---- */
-const SQUAD = [
-  { n: 1,  fn: 'Adon',     ln: 'Blaaws',         pos: 'Utility Back',    status: 'Committed', fit: 'Good',    contract: false, caps: 187, phone: true },
-  { n: 2,  fn: 'Luca',     ln: 'Ambrosi',        pos: 'Utility Forward', status: '—',         fit: 'Good',    contract: false, caps: 64,  phone: true },
-  { n: 3,  fn: 'Jesse-Lee',ln: 'Barnier',        pos: 'Wing',            status: '—',         fit: 'Good',    contract: false, caps: 41,  phone: true },
-  { n: 4,  fn: 'Vuyo',     ln: 'Bistoli',        pos: 'Utility Forward', status: 'Unknown',   fit: 'Good',    contract: false, caps: 28,  phone: true },
-  { n: 5,  fn: 'Luthando', ln: 'Bulana',         pos: 'Prop',            status: 'Committed', fit: 'Good',    contract: true,  caps: 155, phone: true },
-  { n: 6,  fn: 'Arnold',   ln: 'Bunu',           pos: 'Wing',            status: '—',         fit: 'Good',    contract: false, caps: 32,  phone: true },
-  { n: 7,  fn: 'Richwen',  ln: 'Codee-Waries',   pos: 'Utility Forward', status: 'Committed', fit: 'Injured', contract: false, caps: 98,  phone: true },
-  { n: 8,  fn: 'Ethan',    ln: 'Coetzee',        pos: 'Utility Forward', status: 'Committed', fit: 'Good',    contract: true,  caps: 141, phone: true },
-  { n: 9,  fn: 'Reginald', ln: 'Fulla',          pos: 'Utility Forward', status: 'Committed', fit: 'Good',    contract: true,  caps: 128, phone: true },
-  { n: 10, fn: 'Siyasanga',ln: 'Mkiva',          pos: 'Hooker',          status: 'Committed', fit: 'Good',    contract: true,  caps: 224, phone: true },
-  { n: 11, fn: 'Thabo',    ln: 'Jacobs',         pos: 'Lock',            status: 'Committed', fit: 'Good',    contract: false, caps: 87,  phone: true },
-  { n: 12, fn: 'Khaya',    ln: 'Mathebula',      pos: 'Scrumhalf',       status: 'Committed', fit: 'Good',    contract: true,  caps: 95,  phone: true },
-  { n: 13, fn: 'Marius',   ln: 'Naidoo',         pos: 'Flyhalf',         status: 'Committed', fit: 'Good',    contract: true,  caps: 102, phone: true },
-  { n: 14, fn: 'Bongani',  ln: 'Davids',         pos: 'Blindside Flank', status: 'Committed', fit: 'Good',    contract: false, caps: 73,  phone: true },
-  { n: 15, fn: 'Lwazi',    ln: 'Ngubane',        pos: 'Openside Flank',  status: '—',         fit: 'Good',    contract: false, caps: 56,  phone: true },
-  { n: 16, fn: 'Pierre',   ln: 'Petersen',       pos: '8th Man',         status: 'Committed', fit: 'Good',    contract: true,  caps: 119, phone: true },
-  { n: 17, fn: 'Stefan',   ln: 'Mtawana',        pos: 'Outside Centre',  status: 'Committed', fit: 'Good',    contract: false, caps: 78,  phone: true },
-  { n: 18, fn: 'Devon',    ln: 'Adams',          pos: 'Inside Centre',   status: 'Committed', fit: 'Good',    contract: true,  caps: 81,  phone: true },
-  { n: 19, fn: 'Tafadzwa', ln: 'Moyo',           pos: 'Lock',            status: 'Unknown',   fit: 'Recovering', contract: false, caps: 38, phone: false },
-  { n: 20, fn: 'Sipho',    ln: 'Nkosi',          pos: 'Prop',            status: 'Committed', fit: 'Good',    contract: false, caps: 67,  phone: true },
-  { n: 21, fn: 'Jordy',    ln: 'van Wyk',        pos: 'Fullback',        status: 'Committed', fit: 'Good',    contract: true,  caps: 91,  phone: true },
-  { n: 22, fn: 'Tinashe',  ln: 'Chideya',        pos: 'Wing',            status: 'Committed', fit: 'Good',    contract: false, caps: 44,  phone: true },
-  { n: 23, fn: 'Rashid',   ln: 'Cassiem',        pos: 'Hooker',          status: '—',         fit: 'Good',    contract: false, caps: 22,  phone: false },
-  { n: 24, fn: 'Conrad',   ln: 'le Roux',        pos: 'Lock',            status: 'Committed', fit: 'Injured', contract: false, caps: 51,  phone: true },
-  { n: 25, fn: 'Mthuthuzeli',ln:'Khumalo',       pos: 'Scrumhalf',       status: '—',         fit: 'Good',    contract: false, caps: 19,  phone: false },
-  { n: 26, fn: 'Wesley',   ln: 'Daniels',        pos: 'Flyhalf',         status: 'Committed', fit: 'Good',    contract: false, caps: 33,  phone: true },
-  { n: 27, fn: 'Sibusiso', ln: 'Mbuyazi',        pos: 'Inside Centre',   status: '—',         fit: 'Good',    contract: false, caps: 14,  phone: false },
-];
+/* ---- Runtime data — populated after onboarding ---- */
+let SQUAD    = [];
+let FIXTURES = [];
 
-const FIXTURES = [
-  { type: 'Warmup',  opp: 'False Bay',    venue: 'HOME', date: 'Feb 16',  result: 'L', f: 0,  a: 55,  tries: 0 },
-  { type: 'Warmup',  opp: 'Rocklands',    venue: 'AWAY', date: 'Feb 24',  result: 'W', f: 19, a: 17,  tries: 3 },
-  { type: 'Warmup',  opp: 'UCT',          venue: 'AWAY', date: 'Mar 9',   result: 'L', f: 19, a: 24,  tries: 3 },
-  { type: 'Warmup',  opp: 'Tygerberg',    venue: 'AWAY', date: 'Mar 16',  result: 'L', f: 7,  a: 103, tries: 1 },
-  { type: 'Warmup',  opp: 'Goodwood',     venue: 'AWAY', date: 'Mar 23',  result: 'L', f: 7,  a: 60,  tries: 1 },
-  { type: 'League',  opp: 'Stellenberg',  venue: 'HOME', date: 'Mar 30',  result: 'L', f: 12, a: 38,  tries: 2 },
-  { type: 'League',  opp: 'Brackenfell',  venue: 'AWAY', date: 'Apr 6',   result: 'W', f: 24, a: 21,  tries: 3 },
-  { type: 'League',  opp: 'Helderberg',   venue: 'HOME', date: 'Apr 13',  result: 'L', f: 10, a: 42,  tries: 1 },
-  { type: 'League',  opp: 'Villager',     venue: 'AWAY', date: 'Apr 20',  result: 'L', f: 14, a: 31,  tries: 2 },
-  { type: 'League',  opp: 'Hamiltons',    venue: 'HOME', date: 'May 4',   result: 'L', f: 17, a: 22,  tries: 2 },
-  { type: 'League',  opp: 'False Bay',    venue: 'AWAY', date: 'May 11',  result: 'L', f: 8,  a: 45,  tries: 1 },
-  { type: 'League',  opp: 'Rocklands',    venue: 'HOME', date: 'May 25',  result: 'W', f: 26, a: 19,  tries: 4 },
-  { type: 'League',  opp: 'UCT',          venue: 'HOME', date: 'Jun 14',  result: null, f: null, a: null, tries: null, upcoming: true },
-  { type: 'League',  opp: 'Stellenberg',  venue: 'AWAY', date: 'Jun 21',  upcoming: true, result: null },
-  { type: 'League',  opp: 'Tygerberg',    venue: 'HOME', date: 'Jun 28',  upcoming: true, result: null },
-];
+/* ---- Team setup store (localStorage-backed) ---- */
+const TEAM_KEY_V2 = 'rugbyai_team_v2';
+const TEAM_DEFAULTS = { name: 'Your club', short: '—', primary: '#182b54', accent: '#c9941e', coachName: 'Head Coach' };
+
+const useTeamSetup = () => {
+  /* Hydrate globals synchronously before first render */
+  const [hasSetup, setHasSetup] = React.useState(() => {
+    try {
+      const raw = localStorage.getItem(TEAM_KEY_V2);
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data.squad)    SQUAD    = data.squad;
+        if (data.fixtures) FIXTURES = data.fixtures;
+        return true;
+      }
+    } catch {}
+    return false;
+  });
+
+  const [teamInfo, setTeamInfo] = React.useState(() => {
+    try {
+      const raw = localStorage.getItem(TEAM_KEY_V2);
+      if (raw) { const d = JSON.parse(raw); return d.team || TEAM_DEFAULTS; }
+    } catch {}
+    return TEAM_DEFAULTS;
+  });
+
+  const commitSetup = (team, squad, fixtures) => {
+    SQUAD    = squad    || [];
+    FIXTURES = fixtures || [];
+    /* Keep window globals in sync so other components see the update */
+    window.SQUAD    = SQUAD;
+    window.FIXTURES = FIXTURES;
+    const data = { team, squad: SQUAD, fixtures: FIXTURES };
+    try { localStorage.setItem(TEAM_KEY_V2, JSON.stringify(data)); } catch {}
+    setTeamInfo(team);
+    setHasSetup(true);
+  };
+
+  const resetSetup = () => {
+    SQUAD    = [];
+    FIXTURES = [];
+    window.SQUAD    = SQUAD;
+    window.FIXTURES = FIXTURES;
+    try {
+      localStorage.removeItem(TEAM_KEY_V2);
+      localStorage.removeItem('rugbyai_practices_v1');
+    } catch {}
+    setTeamInfo(TEAM_DEFAULTS);
+    setHasSetup(false);
+  };
+
+  return { hasSetup, teamInfo, commitSetup, resetSetup };
+};
 
 const ROUTES = [
   { id: 'dashboard', label: 'Season',     icon: '◆', section: 'main' },
@@ -69,13 +79,18 @@ const ROUTES = [
 ];
 
 /* ---- Components ---- */
-const Sidebar = ({ active, onNav, onCollapse }) => (
+const Sidebar = ({ active, onNav, onCollapse, teamInfo, squadCount }) => {
+  const ti = teamInfo || TEAM_DEFAULTS;
+  const mark = ti.short && ti.short !== '—'
+    ? ti.short.slice(0, 2)
+    : ti.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase() || 'R';
+  return (
   <aside className="sidebar">
     <div className="brand">
-      <div className="brand-mark">R</div>
+      <div className="brand-mark">{mark.slice(0, 1)}</div>
       <div>
         <div className="brand-name">RugbyAI</div>
-        <div className="brand-sub">Warwick Pumas RFC</div>
+        <div className="brand-sub">{ti.name}</div>
       </div>
     </div>
 
@@ -88,7 +103,7 @@ const Sidebar = ({ active, onNav, onCollapse }) => (
       >
         <span className="nav-icon">{r.icon}</span>
         <span>{r.label}</span>
-        {r.count !== undefined && <span className="nav-count">{r.count}</span>}
+        {r.id === 'squad' && squadCount > 0 && <span className="nav-count">{squadCount}</span>}
       </div>
     ))}
 
@@ -129,9 +144,9 @@ const Sidebar = ({ active, onNav, onCollapse }) => (
     ))}
 
     <div className="sidebar-foot">
-      <div className="avatar">CL</div>
+      <div className="avatar">{(ti.coachName || 'HC').split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 12, fontWeight: 500 }}>Coach Louw</div>
+        <div style={{ fontSize: 12, fontWeight: 500 }}>{ti.coachName || 'Head Coach'}</div>
         <div style={{ fontSize: 11, color: 'rgba(255,255,255,.55)' }}>Head Coach</div>
       </div>
     </div>
@@ -141,7 +156,8 @@ const Sidebar = ({ active, onNav, onCollapse }) => (
       <span>Collapse</span>
     </button>
   </aside>
-);
+  );
+};
 
 const TopBar = ({ crumb, right, sidebarOpen, onToggleSidebar }) => (
   <header className="topbar">
@@ -332,6 +348,7 @@ const Head = ({ p, size }) => (
 
 Object.assign(window, {
   SQUAD, FIXTURES, ROUTES,
+  TEAM_DEFAULTS, useTeamSetup,
   Sidebar, TopBar, MobileNav,
   Sparkline, FormChart, Badge, Status, Head, initials,
 });

@@ -40,8 +40,308 @@ const PITCH_POS = {
   15: { x: 84, y: 50 },
 };
 
+/* ---- Runsheet — group row colours ---- */
+const GROUP_COLOR_RS = {
+  'Individual': { bg: 'rgba(107,114,128,.07)', fg: '#4b5563',  border: '#9ca3af' },
+  'Squad':      { bg: 'rgba(24,43,84,.08)',    fg: '#182b54',  border: '#3b82f6' },
+  'Forwards':   { bg: 'rgba(201,148,30,.13)',  fg: '#92650a',  border: '#c9941e' },
+  'Backs':      { bg: 'rgba(22,163,74,.10)',   fg: '#15803d',  border: '#22c55e' },
+};
+
+const RUNSHEET_COACH_OPT = ['', 'Head Coach', 'Fwds Coach', 'Backs Coach', 'Asst Coach', 'Captain', 'Team', 'S&C Coach', 'Physio/Doctor'];
+
+const RUNSHEET_TEMPLATES = {
+  away: {
+    label: 'Away game',
+    headerColor: '#c9941e',
+    note: 'KO 16:00 · Sat 14 Jun',
+    items: [
+      { id: 'r1',  time: '14:00', alloc: '',    group: 'Individual', activity: 'Arrive at venue',                  lead: '',              assist: '' },
+      { id: 'r2',  time: '14:30', alloc: '45m', group: 'Squad',      activity: 'Strapping supplied',               lead: 'Physio/Doctor', assist: '' },
+      { id: 'r3',  time: '15:15', alloc: '5m',  group: 'Squad',      activity: 'Coaches chat & squad split',       lead: 'Head Coach',    assist: '' },
+      { id: 'r4',  time: '15:20', alloc: '5m',  group: 'Squad',      activity: 'Passing — short & medium',         lead: 'Head Coach',    assist: '' },
+      { id: 'r5',  time: '',      alloc: '5m',  group: 'Squad',      activity: 'Breakdown',                        lead: 'Head Coach',    assist: '' },
+      { id: 'r6',  time: '15:30', alloc: '5m',  group: 'Squad',      activity: 'Defence — blitz lines',            lead: 'Head Coach',    assist: '' },
+      { id: 'r7',  time: '15:35', alloc: '20m', group: 'Forwards',   activity: 'Lineouts and scrums',              lead: 'Fwds Coach',    assist: '' },
+      { id: 'r8',  time: '',      alloc: '20m', group: 'Backs',      activity: 'Plays — shapes (Bus / Plus)',      lead: 'Backs Coach',   assist: '' },
+      { id: 'r9',  time: '15:55', alloc: '',    group: 'Squad',      activity: 'Into change rooms — jerseys on',   lead: 'Captain',       assist: '' },
+      { id: 'r10', time: '16:00', alloc: '',    group: 'Squad',      activity: 'Game time',                        lead: 'Team',          assist: '' },
+    ],
+  },
+  home: {
+    label: 'Home game',
+    headerColor: '#182b54',
+    note: 'KO 15:00 · Sat 14 Jun',
+    items: [
+      { id: 'r1',  time: '12:00', alloc: '',    group: 'Individual', activity: 'Arrive at home ground',            lead: '',              assist: '' },
+      { id: 'r2',  time: '12:30', alloc: '30m', group: 'Squad',      activity: 'Strapping supplied',               lead: 'Physio/Doctor', assist: '' },
+      { id: 'r3',  time: '13:00', alloc: '10m', group: 'Squad',      activity: 'Pre-match team talk',              lead: 'Head Coach',    assist: '' },
+      { id: 'r4',  time: '13:10', alloc: '10m', group: 'Squad',      activity: 'Warm-up — movement grids',         lead: 'Head Coach',    assist: '' },
+      { id: 'r5',  time: '13:20', alloc: '10m', group: 'Forwards',   activity: 'Lineout walk-through',             lead: 'Fwds Coach',    assist: '' },
+      { id: 'r6',  time: '',      alloc: '10m', group: 'Backs',      activity: "Back shapes — captain's run",      lead: 'Backs Coach',   assist: '' },
+      { id: 'r7',  time: '13:30', alloc: '10m', group: 'Squad',      activity: 'Final scrimmage — no contact',     lead: 'Head Coach',    assist: '' },
+      { id: 'r8',  time: '13:40', alloc: '',    group: 'Squad',      activity: 'Into sheds — jerseys on',          lead: 'Captain',       assist: '' },
+      { id: 'r9',  time: '14:50', alloc: '10m', group: 'Squad',      activity: 'Pre-match warm-up on field',       lead: 'Head Coach',    assist: '' },
+      { id: 'r10', time: '15:00', alloc: '',    group: 'Squad',      activity: 'Kick-off',                         lead: 'Team',          assist: '' },
+    ],
+  },
+  captains_run: {
+    label: "Captain's run",
+    headerColor: '#2e7a45',
+    note: 'Day before match · Fri 13 Jun',
+    items: [
+      { id: 'r1', time: '10:00', alloc: '',    group: 'Squad',    activity: 'Arrive — light activation',       lead: '',            assist: '' },
+      { id: 'r2', time: '10:10', alloc: '10m', group: 'Squad',    activity: 'Passing & handling',              lead: 'Head Coach',  assist: '' },
+      { id: 'r3', time: '10:20', alloc: '15m', group: 'Forwards', activity: 'Lineout calls — walk-through',    lead: 'Fwds Coach',  assist: '' },
+      { id: 'r4', time: '',      alloc: '15m', group: 'Backs',    activity: 'Set plays — half speed',          lead: 'Backs Coach', assist: '' },
+      { id: 'r5', time: '10:35', alloc: '10m', group: 'Squad',    activity: '5-phase team run — no contact',   lead: 'Head Coach',  assist: '' },
+      { id: 'r6', time: '10:45', alloc: '',    group: 'Squad',    activity: "Captain's address and dismiss",   lead: 'Captain',     assist: '' },
+    ],
+  },
+};
+
+/* ---- Runsheet view ---- */
+const RunsheetView = ({ next }) => {
+  const [tplKey, setTplKey] = React.useState('away');
+  const [items, setItems]   = React.useState(() => RUNSHEET_TEMPLATES.away.items.map(i => ({ ...i })));
+  const [editCell, setEditCell] = React.useState(null); // { id, field }
+
+  const applyTemplate = (key) => {
+    setTplKey(key);
+    setItems(RUNSHEET_TEMPLATES[key].items.map(i => ({ ...i })));
+    setEditCell(null);
+  };
+  const updateItem = (id, field, value) =>
+    setItems(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item));
+  const addRow    = () => setItems(prev => [...prev, { id: 'r_' + Date.now(), time: '', alloc: '', group: 'Squad', activity: '', lead: '', assist: '' }]);
+  const removeRow = (id) => setItems(prev => prev.filter(item => item.id !== id));
+
+  const isEd    = (id, f) => editCell?.id === id && editCell?.field === f;
+  const startEd = (id, f) => setEditCell({ id, field: f });
+  const stopEd  = () => setEditCell(null);
+
+  const iInput = (extra = {}) => ({
+    padding: '2px 5px', borderRadius: 4,
+    border: '1px solid var(--primary)', outline: 'none',
+    fontSize: 11, fontFamily: 'inherit', background: 'var(--chalk)',
+    boxShadow: '0 0 0 2px rgba(24,43,84,.08)', ...extra,
+  });
+  const EH = ({ children, onClick, mono, style: s = {} }) => (
+    <span onClick={onClick}
+      style={{ cursor: 'text', display: 'inline-block', borderRadius: 3, padding: '1px 3px',
+        fontFamily: mono ? 'var(--font-mono)' : 'inherit', transition: 'background .1s', ...s }}
+      onMouseEnter={e => e.currentTarget.style.background = 'var(--paper-2)'}
+      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+    >{children}</span>
+  );
+
+  const tpl = RUNSHEET_TEMPLATES[tplKey];
+
+  return (
+    <div>
+      {/* Template strip */}
+      <div className="toolbar" style={{ marginBottom: 14 }}>
+        <span className="mono" style={{ fontSize: 11, marginRight: 4 }}>Template</span>
+        {Object.entries(RUNSHEET_TEMPLATES).map(([key, t]) => (
+          <button key={key} className={`chip ${tplKey === key ? 'active' : ''}`} onClick={() => applyTemplate(key)}>{t.label}</button>
+        ))}
+        <div style={{ flex: 1 }} />
+        <button className="btn sm">↓ Export PDF</button>
+        <button className="btn sm">✉ Send to squad</button>
+        <button className="btn sm primary">✓ Publish</button>
+      </div>
+
+      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        {/* Coloured header */}
+        <div style={{
+          background: tpl.headerColor, color: '#fff',
+          padding: '11px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          fontWeight: 800, fontSize: 12, letterSpacing: '.08em', textTransform: 'uppercase',
+        }}>
+          <span>{tpl.label.toUpperCase()} · {next ? `vs ${next.opp}` : ''}</span>
+          <span style={{ fontWeight: 500, fontSize: 11, opacity: .85, textTransform: 'none', letterSpacing: 0 }}>{tpl.note}</span>
+        </div>
+
+        <table className="table" style={{ margin: 0, borderRadius: 0 }}>
+          <thead style={{ background: 'rgba(24,43,84,.06)' }}>
+            <tr>
+              <th style={{ width: 68,  color: 'var(--primary)', fontWeight: 800 }}>Time</th>
+              <th style={{ width: 62,  color: 'var(--primary)', fontWeight: 800 }}>Alloc.</th>
+              <th style={{ width: 116, color: 'var(--primary)', fontWeight: 800 }}>Unit / Group</th>
+              <th style={{              color: 'var(--primary)', fontWeight: 800 }}>Work on / Challenge</th>
+              <th style={{ width: 118, color: 'var(--primary)', fontWeight: 800 }}>Lead</th>
+              <th style={{ width: 118, color: 'var(--primary)', fontWeight: 800 }}>Assist</th>
+              <th style={{ width: 24 }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map(item => {
+              const g = GROUP_COLOR_RS[item.group] || GROUP_COLOR_RS['Squad'];
+              return (
+                <tr key={item.id} style={{ background: g.bg }}>
+                  {/* TIME */}
+                  <td style={{ borderLeft: '3px solid ' + g.border, paddingLeft: 8 }}>
+                    {isEd(item.id,'time') ? (
+                      <input type="time" autoFocus defaultValue={item.time}
+                        style={{ ...iInput(), width: 76, fontFamily: 'var(--font-mono)', fontWeight: 700 }}
+                        onBlur={e => { updateItem(item.id,'time',e.target.value); stopEd(); }}
+                        onKeyDown={e => { if(e.key==='Enter') e.target.blur(); if(e.key==='Escape') stopEd(); }}
+                      />
+                    ) : (
+                      <EH mono onClick={() => startEd(item.id,'time')} style={{ fontWeight: 700, fontSize: 13, color: item.time ? 'var(--ink)' : 'var(--muted)' }}>
+                        {item.time || '—'}
+                      </EH>
+                    )}
+                  </td>
+                  {/* ALLOC */}
+                  <td>
+                    {isEd(item.id,'alloc') ? (
+                      <input autoFocus defaultValue={item.alloc} placeholder="e.g. 15m"
+                        style={{ ...iInput(), width: 52, fontFamily: 'var(--font-mono)' }}
+                        onBlur={e => { updateItem(item.id,'alloc',e.target.value); stopEd(); }}
+                        onKeyDown={e => { if(e.key==='Enter') e.target.blur(); if(e.key==='Escape') stopEd(); }}
+                      />
+                    ) : (
+                      <EH mono onClick={() => startEd(item.id,'alloc')} style={{ fontSize: 12, fontWeight: 600, color: item.alloc ? 'var(--ink-soft)' : 'var(--muted)' }}>
+                        {item.alloc || '—'}
+                      </EH>
+                    )}
+                  </td>
+                  {/* GROUP */}
+                  <td>
+                    {isEd(item.id,'group') ? (
+                      <select autoFocus defaultValue={item.group}
+                        style={{ ...iInput(), fontSize: 11 }}
+                        onChange={e => { updateItem(item.id,'group',e.target.value); stopEd(); }}
+                        onBlur={stopEd}
+                      >
+                        {['Individual','Squad','Forwards','Backs'].map(g => <option key={g}>{g}</option>)}
+                      </select>
+                    ) : (
+                      <span onClick={() => startEd(item.id,'group')} style={{
+                        display: 'inline-block', background: g.bg, color: g.fg,
+                        border: '1px solid ' + g.border, borderRadius: 4,
+                        padding: '2px 8px', fontSize: 10, fontWeight: 700, cursor: 'pointer', letterSpacing: '.03em',
+                      }}>{item.group}</span>
+                    )}
+                  </td>
+                  {/* ACTIVITY */}
+                  <td>
+                    {isEd(item.id,'activity') ? (
+                      <input autoFocus defaultValue={item.activity} placeholder="Describe this block…"
+                        style={{ ...iInput(), width: '100%', fontWeight: 700, fontSize: 13 }}
+                        onBlur={e => { updateItem(item.id,'activity',e.target.value.trim()||item.activity); stopEd(); }}
+                        onKeyDown={e => { if(e.key==='Enter') e.target.blur(); if(e.key==='Escape') stopEd(); }}
+                      />
+                    ) : (
+                      <EH onClick={() => startEd(item.id,'activity')} style={{ fontWeight: 700, fontSize: 13 }}>
+                        {item.activity || <span style={{ fontWeight: 400, color: 'var(--muted)', fontStyle: 'italic' }}>+ activity</span>}
+                      </EH>
+                    )}
+                  </td>
+                  {/* LEAD */}
+                  <td>
+                    {isEd(item.id,'lead') ? (
+                      <select autoFocus defaultValue={item.lead}
+                        style={{ ...iInput(), fontSize: 11, fontFamily: 'var(--font-mono)', maxWidth: 108 }}
+                        onChange={e => { updateItem(item.id,'lead',e.target.value); stopEd(); }}
+                        onBlur={stopEd}
+                      >
+                        {RUNSHEET_COACH_OPT.map(c => <option key={c} value={c}>{c||'—'}</option>)}
+                      </select>
+                    ) : (
+                      <EH mono onClick={() => startEd(item.id,'lead')} style={{ fontSize: 11, color: item.lead ? 'var(--ink-soft)' : 'var(--muted)' }}>
+                        {item.lead || '—'}
+                      </EH>
+                    )}
+                  </td>
+                  {/* ASSIST */}
+                  <td>
+                    {isEd(item.id,'assist') ? (
+                      <select autoFocus defaultValue={item.assist}
+                        style={{ ...iInput(), fontSize: 11, fontFamily: 'var(--font-mono)', maxWidth: 108 }}
+                        onChange={e => { updateItem(item.id,'assist',e.target.value); stopEd(); }}
+                        onBlur={stopEd}
+                      >
+                        {RUNSHEET_COACH_OPT.map(c => <option key={c} value={c}>{c||'—'}</option>)}
+                      </select>
+                    ) : (
+                      <EH mono onClick={() => startEd(item.id,'assist')} style={{ fontSize: 11, color: item.assist ? 'var(--ink-soft)' : 'var(--muted)' }}>
+                        {item.assist || '—'}
+                      </EH>
+                    )}
+                  </td>
+                  {/* REMOVE */}
+                  <td>
+                    <button onClick={() => removeRow(item.id)} style={{ background:'transparent',border:0,color:'var(--muted)',cursor:'pointer',fontSize:13,padding:0,lineHeight:1 }}>×</button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <div style={{ padding: '8px 14px', borderTop: '1px dashed var(--line)' }}>
+          <button className="btn sm" onClick={addRow}>+ Add row</button>
+        </div>
+      </div>
+
+      <div className="ai-card" style={{ marginTop: 14 }}>
+        <div className="ai-glyph">AI</div>
+        <div className="body">
+          Last 3 away wins included a <em>lineout walk-through</em> before jerseys on — current runsheet skips this. Add at 15:48?
+        </div>
+        <button className="btn accent">Add to runsheet</button>
+        <button className="btn">Dismiss</button>
+      </div>
+    </div>
+  );
+};
+
+/* ---- Match Day quick-links strip ---- */
+const MatchDayQuickLinks = ({ onNav }) => (
+  <div style={{
+    position: 'sticky', bottom: 0, zIndex: 10,
+    background: 'var(--paper)',
+    borderTop: '2px solid var(--line)',
+    padding: '10px 18px',
+    display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap',
+  }}>
+    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--muted)', letterSpacing: '.08em', marginRight: 6, whiteSpace: 'nowrap' }}>
+      QUICK LINKS
+    </span>
+    {[
+      { id: 'opponent',  icon: '◉', label: 'Opp Intel',   stat: '5 of 7 losses', sc: 'var(--warn)' },
+      { id: 'tactical',  icon: '◈', label: 'Tactical',    stat: 'Win prob 29%',  sc: 'var(--warn)' },
+      { id: 'setpiece',  icon: '⬆', label: 'Set Piece',   stat: 'LO win 73%',    sc: 'var(--ok)'   },
+      { id: 'kicking',   icon: '◎', label: 'Kicking',     stat: 'Territory 38%', sc: 'var(--muted)' },
+      { id: 'workload',  icon: '◑', label: 'Workload',    stat: '3 amber flags', sc: '#f59e0b'      },
+      { id: 'breakdown', icon: '⊕', label: 'Breakdown',   stat: '34% win rate',  sc: 'var(--muted)' },
+    ].map(link => (
+      <button
+        key={link.id}
+        onClick={() => onNav && onNav(link.id)}
+        style={{
+          background: 'var(--chalk)', border: '1px solid var(--line)', borderRadius: 8,
+          padding: '6px 12px', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', gap: 7,
+          fontFamily: 'inherit', transition: 'border-color .15s, background .15s',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.background = 'var(--primary-soft)'; }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--line)';    e.currentTarget.style.background = 'var(--chalk)'; }}
+      >
+        <span style={{ fontSize: 15, color: 'var(--primary)' }}>{link.icon}</span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink)', lineHeight: 1.2 }}>{link.label}</span>
+          <span style={{ fontSize: 10, fontFamily: 'var(--font-mono)', color: link.sc, lineHeight: 1.2 }}>{link.stat}</span>
+        </div>
+        <span style={{ fontSize: 11, color: 'var(--muted)', marginLeft: 2 }}>→</span>
+      </button>
+    ))}
+  </div>
+);
+
 /* ---- Container ---- */
-const MatchDay = () => {
+const MatchDay = ({ onNav }) => {
   const [mode, setMode] = React.useState('pre');
   const [xv, setXv] = React.useState(DEFAULT_XV);
   const [bench, setBench] = React.useState(DEFAULT_BENCH);
@@ -73,13 +373,16 @@ const MatchDay = () => {
       {mode === 'live'     && <LiveMatchView xv={xv} bench={bench} getPlayer={getPlayer} next={next} onLeave={() => setMode('post')} />}
       {mode === 'sideline' && <SidelineView xv={xv} getPlayer={getPlayer} next={next} />}
       {mode === 'post'     && <PostMatchView next={next} />}
+
+      {/* Quick-links strip — all modes except sideline */}
+      {mode !== 'sideline' && <MatchDayQuickLinks onNav={onNav} />}
     </div>
   );
 };
 
-/* ---- Pre-match view (XV builder with drag-and-drop + list/pitch toggle) ---- */
+/* ---- Pre-match view (XV builder with drag-and-drop + list/pitch/runsheet toggle) ---- */
 const PreMatchView = ({ xv, setXv, bench, setBench, getPlayer, next }) => {
-  const [view, setView] = React.useState('pitch'); // pitch | list
+  const [view, setView] = React.useState('pitch'); // pitch | list | runsheet
   const [draggingId, setDraggingId] = React.useState(null);
   const [dragOverJersey, setDragOverJersey] = React.useState(null);
   const [trayQuery, setTrayQuery] = React.useState('');
@@ -176,8 +479,9 @@ const PreMatchView = ({ xv, setXv, bench, setBench, getPlayer, next }) => {
           </div>
           <div className="row gap-3">
             <div className="view-toggle">
-              <button className={view === 'pitch' ? 'active' : ''} onClick={() => setView('pitch')}>▣ Pitch</button>
-              <button className={view === 'list' ? 'active' : ''} onClick={() => setView('list')}>≡ List</button>
+              <button className={view === 'pitch'    ? 'active' : ''} onClick={() => setView('pitch')}>▣ Pitch</button>
+              <button className={view === 'list'     ? 'active' : ''} onClick={() => setView('list')}>≡ List</button>
+              <button className={view === 'runsheet' ? 'active' : ''} onClick={() => setView('runsheet')}>📋 Runsheet</button>
             </div>
             <button className="btn sm">↶ Undo</button>
             <button className="btn sm accent">✦ Auto-fill</button>
@@ -186,7 +490,10 @@ const PreMatchView = ({ xv, setXv, bench, setBench, getPlayer, next }) => {
         </div>
       </div>
 
-      <div className="split match">
+      {/* Runsheet — full-width, no squad tray */}
+      {view === 'runsheet' && <RunsheetView next={next} />}
+
+      <div className="split match" style={{ display: view === 'runsheet' ? 'none' : undefined }}>
         {/* Tray */}
         <div className="card" style={{ padding: 14, alignSelf: 'flex-start' }}>
           <div className="row between" style={{ marginBottom: 10 }}>

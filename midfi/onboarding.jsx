@@ -140,26 +140,69 @@ const STEPS = [
   { id: 'done',     label: 'Done' },
 ];
 
-const Onboarding = () => {
+/* Parse a pasted CSV into squad rows */
+const parseSquadCsv = (csv) => {
+  const lines = csv.trim().split('\n').filter(l => l.trim());
+  if (lines.length < 2) return [];
+  return lines.slice(1).map((line, i) => {
+    const p = line.split(',').map(s => s.trim());
+    return {
+      n:        i + 1,
+      pos:      p[0] || 'Player',
+      fn:       p[1] || '',
+      ln:       p[2] || '',
+      phone:    !!(p[3] && p[3].replace(/[^0-9]/g, '').length > 5),
+      status:   'Committed',
+      fit:      'Good',
+      contract: false,
+      caps:     0,
+    };
+  }).filter(p => p.fn || p.ln);
+};
+
+const Onboarding = ({ onComplete }) => {
   const [step, setStep] = React.useState(0);
   const [club, setClub] = React.useState({
-    name:    'Warwick Pumas RFC',
-    short:   'PUM',
-    nick:    'The Pumas',
+    name:    '',
+    short:   '',
+    nick:    '',
     primary: '#182b54',
     accent:  '#c9941e',
-    home:    'Sportground 1, Cape Town',
+    home:    '',
     logoUrl: null,
+    coachName: '',
   });
   const [season, setSeason] = React.useState({
-    year: '2024', league: 'Western Cape Premier B', warmups: 5, matches: 14,
+    year: new Date().getFullYear().toString(),
+    league: '', warmups: 3, matches: 14, rhythm: 'Tue + Thu',
   });
   const [squadMethod, setSquadMethod] = React.useState('csv');
   const [csvText, setCsvText]         = React.useState('');
+  const [parsedSquad, setParsedSquad] = React.useState([]);
+  const [fixtures, setFixtures]       = React.useState([]);
   const [fixturesEntered, setFixturesEntered] = React.useState(false);
 
   const next = () => setStep(s => Math.min(STEPS.length - 1, s + 1));
   const prev = () => setStep(s => Math.max(0, s - 1));
+
+  /* Parse squad CSV whenever text changes */
+  React.useEffect(() => {
+    if (csvText) setParsedSquad(parseSquadCsv(csvText));
+    else setParsedSquad([]);
+  }, [csvText]);
+
+  const handleComplete = () => {
+    const teamData = {
+      name:      club.name  || 'My Club',
+      short:     club.short || club.name.slice(0, 3).toUpperCase() || 'RFC',
+      nick:      club.nick,
+      primary:   club.primary,
+      accent:    club.accent,
+      home:      club.home,
+      coachName: club.coachName || 'Head Coach',
+    };
+    if (onComplete) onComplete(teamData, parsedSquad, fixtures);
+  };
 
   /* Keep CSS vars in sync whenever club colours change */
   React.useEffect(() => {
@@ -186,9 +229,9 @@ const Onboarding = () => {
 
       {step === 0 && <StepClub club={club} setClub={setClub} onNext={next} />}
       {step === 1 && <StepSeason season={season} setSeason={setSeason} onPrev={prev} onNext={next} />}
-      {step === 2 && <StepSquad method={squadMethod} setMethod={setSquadMethod} csv={csvText} setCsv={setCsvText} onPrev={prev} onNext={next} />}
-      {step === 3 && <StepFixtures entered={fixturesEntered} setEntered={setFixturesEntered} onPrev={prev} onNext={next} />}
-      {step === 4 && <StepDone club={club} />}
+      {step === 2 && <StepSquad method={squadMethod} setMethod={setSquadMethod} csv={csvText} setCsv={setCsvText} parsedCount={parsedSquad.length} onPrev={prev} onNext={next} />}
+      {step === 3 && <StepFixtures entered={fixturesEntered} setEntered={setFixturesEntered} fixtures={fixtures} setFixtures={setFixtures} onPrev={prev} onNext={next} />}
+      {step === 4 && <StepDone club={club} parsedSquad={parsedSquad} onComplete={handleComplete} />}
     </div>
   );
 };
@@ -410,18 +453,21 @@ const StepClub = ({ club, setClub, onNext }) => {
       {/* Club name fields */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         <FormRow label="Club name" hint="Full official name">
-          <input className="input" value={club.name} onChange={e => setClub({ ...club, name: e.target.value })} />
+          <input className="input" placeholder="e.g. Warwick RFC" value={club.name} onChange={e => setClub({ ...club, name: e.target.value })} />
         </FormRow>
         <FormRow label="Short code" hint="3–4 letters · used on scoreboards">
-          <input className="input" maxLength={4} value={club.short}
+          <input className="input" maxLength={4} placeholder="RFC" value={club.short}
             onChange={e => setClub({ ...club, short: e.target.value.toUpperCase() })}
             style={{ width: 100, fontFamily: 'var(--font-mono)', letterSpacing: '.1em' }} />
         </FormRow>
         <FormRow label="Nickname" hint="Optional — for the social channel">
-          <input className="input" value={club.nick} onChange={e => setClub({ ...club, nick: e.target.value })} />
+          <input className="input" placeholder="e.g. The Lions" value={club.nick} onChange={e => setClub({ ...club, nick: e.target.value })} />
         </FormRow>
         <FormRow label="Home ground" hint="Address shows on fixture cards">
-          <input className="input" value={club.home} onChange={e => setClub({ ...club, home: e.target.value })} />
+          <input className="input" placeholder="e.g. Newlands Ground, Cape Town" value={club.home} onChange={e => setClub({ ...club, home: e.target.value })} />
+        </FormRow>
+        <FormRow label="Your name" hint="Head coach — shows in the sidebar">
+          <input className="input" placeholder="e.g. Coach Smith" value={club.coachName} onChange={e => setClub({ ...club, coachName: e.target.value })} />
         </FormRow>
       </div>
 
@@ -437,7 +483,7 @@ const StepClub = ({ club, setClub, onNext }) => {
    ───────────────────────────────────────────── */
 const StepSeason = ({ season, setSeason, onPrev, onNext }) => (
   <div className="onb-card">
-    <h2>The 2024 season at a glance.</h2>
+    <h2>Season at a glance.</h2>
     <div className="muted" style={{ marginBottom: 20, fontSize: 15 }}>Just the structure. You'll add actual fixtures next.</div>
 
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -446,7 +492,7 @@ const StepSeason = ({ season, setSeason, onPrev, onNext }) => (
           style={{ fontFamily: 'var(--font-mono)', fontSize: 16 }} />
       </FormRow>
       <FormRow label="League / division">
-        <input className="input" value={season.league} onChange={e => setSeason({ ...season, league: e.target.value })} />
+        <input className="input" placeholder="e.g. Western Cape Premier B" value={season.league} onChange={e => setSeason({ ...season, league: e.target.value })} />
       </FormRow>
       <FormRow label="Warmup matches" hint="Pre-season friendlies">
         <input className="input" type="number" min="0" max="20" value={season.warmups}
@@ -463,7 +509,11 @@ const StepSeason = ({ season, setSeason, onPrev, onNext }) => (
     <FormRow label="Practice rhythm" hint="So the planner can pre-fill the calendar">
       <div className="row gap-3 wrap">
         {['Tue + Thu', 'Mon + Wed + Fri', 'Wed + Fri', 'Tue + Thu + Sat AM', 'Custom'].map(p => (
-          <button key={p} className={`chip ${p === 'Tue + Thu' ? 'active' : ''}`}>{p}</button>
+          <button
+            key={p}
+            className={`chip ${season.rhythm === p ? 'active' : ''}`}
+            onClick={() => setSeason({ ...season, rhythm: p })}
+          >{p}</button>
         ))}
       </div>
     </FormRow>
@@ -478,7 +528,7 @@ const StepSeason = ({ season, setSeason, onPrev, onNext }) => (
 /* ─────────────────────────────────────────────
    Step 3 — Squad
    ───────────────────────────────────────────── */
-const StepSquad = ({ method, setMethod, csv, setCsv, onPrev, onNext }) => {
+const StepSquad = ({ method, setMethod, csv, setCsv, parsedCount, onPrev, onNext }) => {
   const sampleCsv = `Position,First Name,Last Name,Phone,Notes
 Loosehead Prop,Luthando,Bulana,+27 82 ...,Captain
 Hooker,Siyasanga,Mkiva,+27 71 ...,
@@ -511,12 +561,12 @@ Lock,Thabo,Jacobs,+27 76 ...,
           <textarea className="input" placeholder={sampleCsv} value={csv}
             onChange={e => setCsv(e.target.value)} rows={10}
             style={{ width: '100%', fontFamily: 'var(--font-mono)', fontSize: 12, resize: 'vertical' }} />
-          {csv && (
+          {parsedCount > 0 && (
             <div className="card paper" style={{ marginTop: 12, padding: 12 }}>
               <div className="row between">
                 <div>
                   <div className="mono">Preview</div>
-                  <div style={{ fontSize: 14, fontWeight: 500 }}>{csv.split('\n').filter(l => l.trim()).length - 1} players detected</div>
+                  <div style={{ fontSize: 14, fontWeight: 500 }}>{parsedCount} players detected</div>
                 </div>
                 <Badge variant="ok">Ready to import</Badge>
               </div>
@@ -574,49 +624,58 @@ Lock,Thabo,Jacobs,+27 76 ...,
 /* ─────────────────────────────────────────────
    Step 4 — Fixtures
    ───────────────────────────────────────────── */
-const StepFixtures = ({ entered, setEntered, onPrev, onNext }) => (
+const BLANK_FIXTURE = () => ({ type: 'League', opp: '', venue: 'HOME', date: '', kickoff: '15:00' });
+
+const StepFixtures = ({ entered, setEntered, fixtures, setFixtures, onPrev, onNext }) => {
+  const addRow = () => setFixtures(prev => [...prev, BLANK_FIXTURE()]);
+  const upd = (i, field, val) => setFixtures(prev => prev.map((f, idx) => idx === i ? { ...f, [field]: val } : f));
+  const del = (i) => setFixtures(prev => prev.filter((_, idx) => idx !== i));
+
+  return (
   <div className="onb-card">
     <h2>What's the fixture list?</h2>
-    <div className="muted" style={{ marginBottom: 20, fontSize: 15 }}>Paste, import, or skip. Each fixture creates a Match Day workspace.</div>
+    <div className="muted" style={{ marginBottom: 20, fontSize: 15 }}>Add your fixtures here — each one creates a Match Day workspace. You can add more from the Calendar later.</div>
 
-    {!entered ? (
+    {fixtures.length === 0 && !entered ? (
       <div className="empty-zone" style={{ padding: 36 }}>
         <div style={{ fontSize: 32, marginBottom: 10 }}>📅</div>
         <div style={{ fontWeight: 600, color: 'var(--ink)', marginBottom: 4 }}>No fixtures yet</div>
-        <div>Drop a CSV, paste from the union website, or add them one at a time.</div>
+        <div>Add them one at a time, or skip and build the calendar later.</div>
         <div className="row gap-3" style={{ justifyContent: 'center', marginTop: 18 }}>
-          <button className="btn primary" onClick={() => setEntered(true)}>Add fixtures</button>
-          <button className="btn">Import from .csv</button>
-          <button className="btn">Skip for now</button>
+          <button className="btn primary" onClick={() => { setEntered(true); addRow(); }}>Add fixtures</button>
+          <button className="btn" onClick={onNext}>Skip for now</button>
         </div>
       </div>
     ) : (
       <>
-        <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr 80px 110px 110px', gap: 6, alignItems: 'center', marginBottom: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr 80px 120px 90px 28px', gap: 6, alignItems: 'center', marginBottom: 8 }}>
           <span className="mono">Type</span>
           <span className="mono">Opposition</span>
           <span className="mono">H/A</span>
           <span className="mono">Date</span>
           <span className="mono">Kickoff</span>
+          <span />
         </div>
-        {[
-          ['Warmup', 'False Bay', 'HOME', '16 Feb', '15:00'],
-          ['Warmup', 'Rocklands', 'AWAY', '24 Feb', '15:30'],
-          ['League', 'Stellenberg', 'HOME', '30 Mar', '15:00'],
-        ].map((row, i) => (
-          <div key={i} style={{ display: 'grid', gridTemplateColumns: '120px 1fr 80px 110px 110px', gap: 6, marginBottom: 4 }}>
-            <select className="input" defaultValue={row[0]}><option>Warmup</option><option>League</option><option>Cup</option></select>
-            <input className="input" defaultValue={row[1]} />
-            <select className="input" defaultValue={row[2]}><option>HOME</option><option>AWAY</option></select>
-            <input className="input" defaultValue={row[3]} />
-            <input className="input" defaultValue={row[4]} style={{ fontFamily: 'var(--font-mono)' }} />
+        {fixtures.map((row, i) => (
+          <div key={i} style={{ display: 'grid', gridTemplateColumns: '110px 1fr 80px 120px 90px 28px', gap: 6, marginBottom: 4, alignItems: 'center' }}>
+            <select className="input" value={row.type} onChange={e => upd(i,'type',e.target.value)}>
+              <option>Warmup</option><option>League</option><option>Cup</option><option>Playoff</option>
+            </select>
+            <input className="input" placeholder="Opposition" value={row.opp} onChange={e => upd(i,'opp',e.target.value)} />
+            <select className="input" value={row.venue} onChange={e => upd(i,'venue',e.target.value)}>
+              <option>HOME</option><option>AWAY</option>
+            </select>
+            <input className="input" placeholder="e.g. 14 Jun" value={row.date} onChange={e => upd(i,'date',e.target.value)} />
+            <input className="input" value={row.kickoff} onChange={e => upd(i,'kickoff',e.target.value)} style={{ fontFamily: 'var(--font-mono)' }} />
+            <button onClick={() => del(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: 16, padding: 0 }}>×</button>
           </div>
         ))}
-        <button className="btn sm" style={{ marginTop: 10 }}>+ Add fixture</button>
-        <div className="row gap-3" style={{ marginTop: 14 }}>
-          <Badge variant="ok"><span className="dot" />3 fixtures · 16 to go</Badge>
-          <Badge variant="outline">Auto-generate practice calendar</Badge>
-        </div>
+        <button className="btn sm" style={{ marginTop: 10 }} onClick={addRow}>+ Add fixture</button>
+        {fixtures.length > 0 && (
+          <div className="row gap-3" style={{ marginTop: 14 }}>
+            <Badge variant="ok"><span className="dot" />{fixtures.length} fixture{fixtures.length !== 1 ? 's' : ''} added</Badge>
+          </div>
+        )}
       </>
     )}
 
@@ -625,12 +684,13 @@ const StepFixtures = ({ entered, setEntered, onPrev, onNext }) => (
       <button className="btn primary lg" onClick={onNext}>Finish setup →</button>
     </div>
   </div>
-);
+  );
+};
 
 /* ─────────────────────────────────────────────
    Step 5 — Done
    ───────────────────────────────────────────── */
-const StepDone = ({ club }) => (
+const StepDone = ({ club, parsedSquad, onComplete }) => (
   <div className="onb-card" style={{ textAlign: 'center' }}>
     <div style={{
       width: 64, height: 64, borderRadius: 16,
@@ -643,35 +703,34 @@ const StepDone = ({ club }) => (
         ? <img src={club.logoUrl} alt={club.name} style={{ width: 64, height: 64, objectFit: 'contain' }} />
         : '✓'}
     </div>
-    <h2 style={{ fontSize: 36 }}>{club.name} is on the board.</h2>
+    <h2 style={{ fontSize: 36 }}>{club.name || 'Your club'} is on the board.</h2>
     <div className="muted" style={{ marginBottom: 28, fontSize: 16 }}>
-      The dashboard, squad, and Match Day are ready. The analyst will start surfacing trends after a few matches.
+      {parsedSquad && parsedSquad.length > 0
+        ? `${parsedSquad.length} players imported. The dashboard, squad, and Match Day are ready.`
+        : 'The dashboard, squad, and Match Day are ready. Add your players from the Squad screen.'}
     </div>
 
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, textAlign: 'left' }}>
       <div className="card paper">
         <div className="mono">Next up</div>
         <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 600, marginTop: 4 }}>Build your XV</div>
-        <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>Open Match Day to draft a team sheet for the first warmup.</div>
-        <button className="btn sm primary" style={{ marginTop: 10 }}>Open Match Day →</button>
+        <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>Open Match Day to draft a team sheet for your first fixture.</div>
       </div>
       <div className="card paper">
         <div className="mono">Then</div>
         <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 600, marginTop: 4 }}>Plan practice</div>
-        <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>The calendar's pre-filled with Tue/Thu slots — drop drills in.</div>
-        <button className="btn sm" style={{ marginTop: 10 }}>Open Practice</button>
+        <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>Drop drills onto the calendar for each session.</div>
       </div>
       <div className="card paper">
         <div className="mono">Anytime</div>
         <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 600, marginTop: 4 }}>Ask the analyst</div>
-        <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>"What did we learn from pre-season?" — quietly powerful once data flows.</div>
-        <button className="btn sm accent" style={{ marginTop: 10 }}>Open Analyst</button>
+        <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>Quietly powerful once match and practice data flows in.</div>
       </div>
     </div>
 
     <div className="row gap-3" style={{ justifyContent: 'center', marginTop: 28 }}>
-      <button className="btn primary lg">Go to dashboard</button>
-      <button className="btn">Invite assistant coach</button>
+      <button className="btn primary lg" onClick={onComplete}>Go to dashboard →</button>
+      <button className="btn" onClick={onComplete}>Skip to app</button>
     </div>
   </div>
 );
@@ -687,4 +746,4 @@ const FormRow = ({ label, hint, children }) => (
   </div>
 );
 
-Object.assign(window, { Onboarding });
+Object.assign(window, { Onboarding, applyBrandTheme, resetBrandTheme });

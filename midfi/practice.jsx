@@ -1,6 +1,12 @@
 /* RugbyAI mid-fi — Practice Planner (week view, drag drills to days) */
 
-const PracticePlanner = ({ practices, addDrill, removeDrill, removePractice, resetSeed, focusDate }) => {
+/* Short 3-letter abbreviation for category pills in the drill table */
+const CAT_ABBR = cat => ({
+  'Skills': 'SKL', 'Set Piece': 'SET', 'Attack': 'ATK',
+  'Defence': 'DEF', 'Game Sim': 'SIM', 'Fitness': 'FIT', 'Recovery': 'REC',
+})[cat] || cat.slice(0, 3).toUpperCase();
+
+const PracticePlanner = ({ practices, addDrill, addDrillToSession, addSession, removeDrill, removePractice, resetSeed, focusDate }) => {
   const [weekStart, setWeekStart] = React.useState(() => startOfWeek(focusDate || TODAY_ISO));
   React.useEffect(() => { if (focusDate) setWeekStart(startOfWeek(focusDate)); }, [focusDate]);
 
@@ -8,6 +14,7 @@ const PracticePlanner = ({ practices, addDrill, removeDrill, removePractice, res
   const [drillQuery, setDrillQuery] = React.useState('');
   const [draggingDrill, setDraggingDrill] = React.useState(null);
   const [dropDate, setDropDate] = React.useState(null);
+  const [dropSessionId, setDropSessionId] = React.useState(null);
 
   /* ── Drill library visibility ── */
   const [libraryOpen, setLibraryOpen] = React.useState(false);
@@ -109,9 +116,10 @@ const PracticePlanner = ({ practices, addDrill, removeDrill, removePractice, res
 
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
-  const byDate = React.useMemo(() => {
+  /* Multi-session: byDateArr maps iso → practice[] */
+  const byDateArr = React.useMemo(() => {
     const map = {};
-    practices.forEach(p => { map[p.date] = p; });
+    practices.forEach(p => { (map[p.date] = map[p.date] || []).push(p); });
     return map;
   }, [practices]);
 
@@ -122,7 +130,7 @@ const PracticePlanner = ({ practices, addDrill, removeDrill, removePractice, res
       (d.desc || '').toLowerCase().includes(drillQuery.toLowerCase())
     );
 
-  const weekPractices = days.map(d => byDate[d]).filter(Boolean);
+  const weekPractices = days.flatMap(d => byDateArr[d] || []);
   const totalMins = weekPractices.reduce((acc, p) =>
     acc + p.drills.reduce((a, did) => a + (drillById[did]?.min || 0), 0), 0);
   const setPieceMins = weekPractices.reduce((acc, p) =>
@@ -138,7 +146,7 @@ const PracticePlanner = ({ practices, addDrill, removeDrill, removePractice, res
     e.dataTransfer.effectAllowed = 'copy';
     e.dataTransfer.setData('text/plain', drillId);
   };
-  const onDrillDragEnd = () => { setDraggingDrill(null); setDropDate(null); };
+  const onDrillDragEnd = () => { setDraggingDrill(null); setDropDate(null); setDropSessionId(null); };
 
   const onTemplateDragStart = (drillIds) => (e) => {
     e.dataTransfer.effectAllowed = 'copy';
@@ -360,54 +368,23 @@ const PracticePlanner = ({ practices, addDrill, removeDrill, removePractice, res
           <div className="col" style={{ gap: 6 }}>
             {days.map((iso) => {
               const { d, dow, m } = parseISO(iso);
-              const session = byDate[iso];
+              const daySessions = byDateArr[iso] || [];
               const fixture = fixtureFor(iso);
               const isMatch = !!fixture;
               const isToday = iso === TODAY_ISO;
-              const dropping = dropDate === iso;
+              const dayDropping = dropDate === iso && daySessions.length === 0;
 
-              /* Build drill rows — overrides applied per slot */
-              const drillRows = session ? session.drills.map((did, idx) => {
-                const drill = drillById[did];
-                if (!drill) return null;
-
-                /* Start time uses overridden durations for preceding drills */
-                const prevMins = session.drills.slice(0, idx).reduce((a, pid, pidx) =>
-                  a + Number(getOv(iso, pidx, 'min', drillById[pid]?.min || 0)), 0);
-                const [sh, sm] = getSOv(iso, 'start', session.start).split(':').map(Number);
-                const tot = sh * 60 + sm + prevMins;
-                const startTime = `${Math.floor(tot / 60)}:${String(tot % 60).padStart(2, '0')}`;
-
-                const defaultLead        = drill.group === 'forwards' ? 'Fwds Coach' : drill.group === 'backs' ? 'Backs Coach' : 'Head Coach';
-                const defaultAssist      = drill.group === 'all' ? 'Asst Coach' : 'Head Coach';
-                const defaultPriorityLbl = drill.intensity === 'High' ? 'KEY' : drill.intensity === 'Med' ? 'IMPORT.' : 'SUPP.';
-
-                const effMin         = Number(getOv(iso, idx, 'min',      drill.min));
-                const effCat         = getOv(iso, idx, 'cat',      drill.cat);
-                const effFocus       = getOv(iso, idx, 'focus',    drill.focus    || '');
-                const effName        = getOv(iso, idx, 'name',     drill.name);
-                const effDesc        = getOv(iso, idx, 'desc',     drill.desc     || '');
-                const effLead        = getOv(iso, idx, 'lead',     defaultLead);
-                const effAssist      = getOv(iso, idx, 'assist',   defaultAssist);
-                const effPriorityLbl = getOv(iso, idx, 'priority', defaultPriorityLbl);
-                const effPriority    = PRIORITY_CFG[effPriorityLbl] || PRIORITY_CFG['SUPP.'];
-                const col            = CAT_COLOR[effCat] || CAT_COLOR[drill.cat];
-
-                return { drill, idx, startTime, effMin, effCat, effFocus, effName, effDesc, effLead, effAssist, effPriority, effPriorityLbl, col };
-              }).filter(Boolean) : [];
-
-              const totalMinsDay = session
-                ? session.drills.reduce((a, did, didx) =>
-                    a + Number(getOv(iso, didx, 'min', drillById[did]?.min || 0)), 0)
-                : 0;
+              const dayTotalMins = daySessions.reduce((a, sess) =>
+                a + sess.drills.reduce((b, did, bidx) =>
+                  b + Number(getOv(sess.id, bidx, 'min', drillById[did]?.min || 0)), 0), 0);
 
               return (
                 <div
                   key={iso}
                   style={{
-                    border: dropping ? '2px solid var(--primary)' : `1px solid ${isToday ? 'var(--accent)' : 'var(--line)'}`,
+                    border: dayDropping ? '2px solid var(--primary)' : `1px solid ${isToday ? 'var(--accent)' : 'var(--line)'}`,
                     borderRadius: 10,
-                    background: isMatch && !session ? 'rgba(201,148,30,.07)' : 'var(--chalk)',
+                    background: isMatch && daySessions.length === 0 ? 'rgba(201,148,30,.07)' : 'var(--chalk)',
                     overflow: 'hidden',
                     transition: 'border-color .12s',
                   }}
@@ -415,268 +392,266 @@ const PracticePlanner = ({ practices, addDrill, removeDrill, removePractice, res
                   onDragLeave={onDayDragLeave}
                   onDrop={onDayDrop(iso)}
                 >
-                  {/* Day header */}
+                  {/* ── Day stamp ── */}
                   <div style={{
-                    display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
-                    borderBottom: session || isMatch ? '1px solid var(--line)' : 'none',
-                    background: session
-                      ? 'var(--primary)'
-                      : isMatch ? 'rgba(201,148,30,.08)' : undefined,
+                    display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px',
+                    borderBottom: (daySessions.length > 0 || isMatch) ? '1px solid var(--line)' : 'none',
+                    background: daySessions.length > 0 ? 'rgba(24,43,84,.04)' : isMatch ? 'rgba(201,148,30,.08)' : undefined,
                   }}>
-                    {/* Day stamp */}
-                    <span style={{
-                      fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: 12,
-                      letterSpacing: '.1em', minWidth: 54,
-                      color: session ? 'var(--accent)' : isMatch ? 'var(--accent)' : 'var(--primary)',
-                    }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: 12, letterSpacing: '.1em', minWidth: 54, color: daySessions.length > 0 ? 'var(--primary)' : isMatch ? 'var(--accent-2)' : 'var(--primary)' }}>
                       {DAY_NAMES_SHORT[dow].toUpperCase()} {d}
                     </span>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: session ? 'rgba(255,255,255,.45)' : 'var(--muted)', minWidth: 56 }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--muted)', minWidth: 56 }}>
                       {MONTH_NAMES_SHORT[m]} {d}{isToday ? ' · TODAY' : ''}
                     </span>
-                    <span style={{ width: 1, height: 16, background: session ? 'rgba(255,255,255,.14)' : 'var(--line)', flexShrink: 0 }} />
-
-                    {session ? (
-                      <>
-                        {/* Session title — editable */}
-                        <input
-                          className="input"
-                          defaultValue={session.focus.toUpperCase()}
-                          style={{
-                            padding: '2px 6px', fontSize: 13, fontWeight: 800,
-                            letterSpacing: '.06em', border: 0,
-                            background: 'rgba(255,255,255,.08)',
-                            color: 'var(--paper)', borderRadius: 4, flex: 1,
-                          }}
-                        />
-                        {/* Start time — click to edit */}
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'rgba(255,255,255,.65)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4 }}>
-                          {isEdS(iso, 'start') ? (
-                            <input
-                              autoFocus type="time"
-                              defaultValue={getSOv(iso, 'start', session.start)}
-                              style={{ ...inlineInput(), width: 82, fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700 }}
-                              onBlur={e => { setSOv(iso, 'start', e.target.value || session.start); stopEdS(); }}
-                              onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'Escape') stopEdS(); }}
-                            />
-                          ) : (
-                            <EditHint
-                              mono onClick={() => startEdS(iso, 'start')}
-                              title="Click to edit start time"
-                              style={{ color: 'var(--accent)', fontWeight: 700, fontSize: 11 }}
-                            >
-                              {getSOv(iso, 'start', session.start)}
-                            </EditHint>
-                          )}
-                          <span style={{ color: 'rgba(255,255,255,.45)' }}>–{session.end} · </span>
-                          <b style={{ color: 'var(--paper)' }}>{totalMinsDay}min</b>
-                        </span>
-                      </>
+                    <span style={{ width: 1, height: 16, background: 'var(--line)', flexShrink: 0 }} />
+                    {daySessions.length > 0 ? (
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--ink-soft)' }}>
+                        {daySessions.length} session{daySessions.length > 1 ? 's' : ''} · <b style={{ color: 'var(--ink)' }}>{dayTotalMins}min</b>
+                      </span>
                     ) : isMatch ? (
-                      <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '.04em' }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-2)', letterSpacing: '.04em' }}>
                         MATCH — vs {fixture.opp} · {fixture.venue} · 15:00 KO
                       </span>
                     ) : (
                       <span style={{ fontSize: 11, color: 'var(--muted)', fontStyle: 'italic' }}>
-                        {dropping ? 'Drop to create session' : 'Rest day'}
+                        {dayDropping ? 'Drop to create session' : 'Rest day'}
                       </span>
-                    )}
-                    {isMatch && session && (
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--accent)', whiteSpace: 'nowrap' }}>🏉 vs {fixture.opp}</span>
-                    )}
-                    <div style={{ flex: 1 }} />
-                    {session && (
-                      <button onClick={() => removePractice(iso)} style={{ background: 'rgba(255,255,255,.08)', border: 0, color: 'rgba(255,255,255,.5)', cursor: 'pointer', fontSize: 14, padding: '1px 6px', lineHeight: 1, borderRadius: 4 }} title="Remove session">×</button>
                     )}
                   </div>
 
-                  {/* ── Editable drill table ── */}
-                  {session && drillRows.length > 0 && (
-                    <table className="table" style={{ margin: 0, borderRadius: 0 }}>
-                      <thead style={{ background: 'rgba(24,43,84,.06)' }}>
-                        <tr>
-                          <th style={{ width: 52, color: 'var(--primary)', fontWeight: 800 }}>Start</th>
-                          <th style={{ width: 56, color: 'var(--primary)', fontWeight: 800 }}>Dur.</th>
-                          <th style={{ width: 154, color: 'var(--primary)', fontWeight: 800 }}>Facet · Focus</th>
-                          <th style={{ color: 'var(--primary)', fontWeight: 800 }}>Drill / Activity</th>
-                          <th style={{ width: 102, color: 'var(--primary)', fontWeight: 800 }}>Lead</th>
-                          <th style={{ width: 102, color: 'var(--primary)', fontWeight: 800 }}>Assist</th>
-                          <th style={{ width: 72, color: 'var(--primary)', fontWeight: 800 }}>Priority</th>
-                          <th style={{ width: 24 }}></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {drillRows.map(({ drill, idx, startTime, effMin, effCat, effFocus, effName, effDesc, effLead, effAssist, effPriority, effPriorityLbl, col }) => (
-                          <tr key={`${iso}-${idx}`}>
+                  {/* ── Session cards (one per session on this day) ── */}
+                  {daySessions.map((session, sIdx) => {
+                    const sid = session.id;
+                    const isSessionDrop = dropSessionId === sid;
 
-                            {/* START — read-only */}
-                            <td style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--ink-soft)' }}>
-                              {startTime}
-                            </td>
+                    const drillRows = session.drills.map((did, idx) => {
+                      const drill = drillById[did];
+                      if (!drill) return null;
+                      const prevMins = session.drills.slice(0, idx).reduce((a, pid, pidx) =>
+                        a + Number(getOv(sid, pidx, 'min', drillById[pid]?.min || 0)), 0);
+                      const [sh, sm] = getSOv(sid, 'start', session.start).split(':').map(Number);
+                      const tot = sh * 60 + sm + prevMins;
+                      const startTime = `${Math.floor(tot / 60)}:${String(tot % 60).padStart(2, '0')}`;
+                      const defaultLead        = drill.group === 'forwards' ? 'Fwds Coach' : drill.group === 'backs' ? 'Backs Coach' : 'Head Coach';
+                      const defaultAssist      = drill.group === 'all' ? 'Asst Coach' : 'Head Coach';
+                      const defaultPriorityLbl = drill.intensity === 'High' ? 'KEY' : drill.intensity === 'Med' ? 'IMPORT.' : 'SUPP.';
+                      const effMin         = Number(getOv(sid, idx, 'min',      drill.min));
+                      const effCat         = getOv(sid, idx, 'cat',      drill.cat);
+                      const effFocus       = getOv(sid, idx, 'focus',    drill.focus    || '');
+                      const effName        = getOv(sid, idx, 'name',     drill.name);
+                      const effDesc        = getOv(sid, idx, 'desc',     drill.desc     || '');
+                      const effLead        = getOv(sid, idx, 'lead',     defaultLead);
+                      const effAssist      = getOv(sid, idx, 'assist',   defaultAssist);
+                      const effPriorityLbl = getOv(sid, idx, 'priority', defaultPriorityLbl);
+                      const effPriority    = PRIORITY_CFG[effPriorityLbl] || PRIORITY_CFG['SUPP.'];
+                      const col            = CAT_COLOR[effCat] || CAT_COLOR[drill.cat];
+                      return { drill, idx, startTime, effMin, effCat, effFocus, effName, effDesc, effLead, effAssist, effPriority, effPriorityLbl, col };
+                    }).filter(Boolean);
 
-                            {/* DUR. — click to edit */}
-                            <td>
-                              {isEd(iso, idx, 'min') ? (
-                                <input
-                                  autoFocus type="number" min="5" max="120"
-                                  defaultValue={effMin}
-                                  style={{ ...inlineInput(), width: 46, fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 12 }}
-                                  onBlur={e => { setOv(iso, idx, 'min', Math.max(5, Number(e.target.value) || effMin)); stopEd(); }}
-                                  onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'Escape') stopEd(); }}
-                                />
-                              ) : (
-                                <EditHint mono onClick={() => startEd(iso, idx, 'min')} title="Click to edit duration" style={{ fontWeight: 700, fontSize: 12 }}>
-                                  {effMin}m
-                                </EditHint>
-                              )}
-                            </td>
+                    const sessionMins = session.drills.reduce((a, did, didx) =>
+                      a + Number(getOv(sid, didx, 'min', drillById[did]?.min || 0)), 0);
 
-                            {/* FACET · FOCUS */}
-                            <td>
-                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 5 }}>
-                                <span
-                                  className="cat-pill"
-                                  onClick={() => startEd(iso, idx, 'cat')}
-                                  title="Click to change category"
-                                  style={{ background: col.bg, color: col.fg, fontSize: 8, flexShrink: 0, cursor: 'pointer', marginTop: 1 }}
-                                >
-                                  {effCat[0]}
-                                </span>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  {isEd(iso, idx, 'cat') ? (
-                                    <select autoFocus defaultValue={effCat}
-                                      style={{ ...inlineInput(), fontSize: 10, marginBottom: 3, maxWidth: 108 }}
-                                      onChange={e => { setOv(iso, idx, 'cat', e.target.value); stopEd(); }}
-                                      onBlur={stopEd}
-                                    >
-                                      {DRILL_CATS.map(c => <option key={c} value={c}>{c}</option>)}
-                                    </select>
-                                  ) : (
-                                    <EditHint onClick={() => startEd(iso, idx, 'cat')} title="Click to change category" style={{ fontSize: 10, fontWeight: 600, color: col.fg, display: 'block', marginBottom: 2 }}>
-                                      {effCat}
-                                    </EditHint>
-                                  )}
-                                  {isEd(iso, idx, 'focus') ? (
-                                    <input autoFocus defaultValue={effFocus} placeholder="Focus cue…"
-                                      style={{ ...inlineInput(), width: 100, fontSize: 10, fontStyle: 'italic' }}
-                                      onBlur={e => { setOv(iso, idx, 'focus', e.target.value); stopEd(); }}
-                                      onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'Escape') stopEd(); }}
-                                    />
-                                  ) : (
-                                    <EditHint onClick={() => startEd(iso, idx, 'focus')} title="Click to edit focus cue" style={{ fontSize: 10, color: 'var(--ink-soft)', fontStyle: 'italic', display: 'block', minHeight: 14 }}>
-                                      {effFocus || <span style={{ color: 'var(--muted)' }}>+ focus</span>}
-                                    </EditHint>
-                                  )}
-                                </div>
-                              </div>
-                            </td>
+                    return (
+                      <div key={sid} style={{ borderTop: sIdx > 0 ? '2px dashed rgba(24,43,84,.18)' : 'none' }}>
 
-                            {/* DRILL / ACTIVITY */}
-                            <td>
-                              {isEd(iso, idx, 'name') ? (
-                                <input autoFocus defaultValue={effName}
-                                  style={{ ...inlineInput(), width: '100%', fontWeight: 600, fontSize: 12, marginBottom: 3 }}
-                                  onBlur={e => { setOv(iso, idx, 'name', e.target.value.trim() || effName); stopEd(); }}
-                                  onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'Escape') stopEd(); }}
-                                />
-                              ) : (
-                                <EditHint onClick={() => startEd(iso, idx, 'name')} title="Click to edit drill name" style={{ fontWeight: 600, fontSize: 12, marginBottom: 2, display: 'inline-block' }}>
-                                  {effName}
-                                  {drill.custom && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--accent-2)', fontWeight: 700, marginLeft: 5 }}>CUSTOM</span>}
-                                </EditHint>
-                              )}
-                              {isEd(iso, idx, 'desc') ? (
-                                <textarea autoFocus defaultValue={effDesc} placeholder="Describe this drill…" rows={3}
-                                  style={{ ...inlineInput(), width: '100%', fontSize: 11, lineHeight: 1.4, resize: 'vertical', fontFamily: 'var(--font-body)', display: 'block', marginTop: 2 }}
-                                  onBlur={e => { setOv(iso, idx, 'desc', e.target.value); stopEd(); }}
-                                  onKeyDown={e => { if (e.key === 'Escape') stopEd(); }}
-                                />
-                              ) : (
-                                <EditHint onClick={() => startEd(iso, idx, 'desc')} title="Click to edit description" style={{ fontSize: 11, color: 'var(--ink-soft)', lineHeight: 1.4, display: 'block', minHeight: 16 }}>
-                                  {effDesc || <span style={{ color: 'var(--muted)', fontStyle: 'italic' }}>+ description</span>}
-                                </EditHint>
-                              )}
-                              {drill.calls && drill.calls.length > 0 && (
-                                <div style={{ display: 'flex', gap: 3, marginTop: 4, flexWrap: 'wrap' }}>
-                                  {drill.calls.map(c => (
-                                    <span key={c} style={{ fontFamily: 'var(--font-mono)', fontSize: 8, fontWeight: 700, letterSpacing: '.06em', padding: '1px 4px', borderRadius: 2, background: 'rgba(24,43,84,.08)', color: 'var(--primary)' }}>{c}</span>
-                                  ))}
-                                </div>
-                              )}
-                            </td>
+                        {/* Session subheader */}
+                        <div style={{
+                          display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
+                          borderBottom: drillRows.length > 0 ? '1px solid var(--line)' : 'none',
+                          background: 'var(--primary)',
+                        }}>
+                          {daySessions.length > 1 && (
+                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 800, background: 'rgba(255,255,255,.14)', color: 'var(--accent)', borderRadius: 4, padding: '2px 6px', flexShrink: 0 }}>
+                              #{sIdx + 1}
+                            </span>
+                          )}
+                          <input
+                            className="input"
+                            key={sid + '_focus'}
+                            defaultValue={session.focus.toUpperCase()}
+                            style={{ padding: '2px 6px', fontSize: 13, fontWeight: 800, letterSpacing: '.06em', border: 0, background: 'rgba(255,255,255,.08)', color: 'var(--paper)', borderRadius: 4, flex: 1 }}
+                          />
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'rgba(255,255,255,.65)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4 }}>
+                            {isEdS(sid, 'start') ? (
+                              <input autoFocus type="time" defaultValue={getSOv(sid, 'start', session.start)}
+                                style={{ ...inlineInput(), width: 82, fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700 }}
+                                onBlur={e => { setSOv(sid, 'start', e.target.value || session.start); stopEdS(); }}
+                                onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'Escape') stopEdS(); }}
+                              />
+                            ) : (
+                              <EditHint mono onClick={() => startEdS(sid, 'start')} title="Click to edit start time" style={{ color: 'var(--accent)', fontWeight: 700, fontSize: 11 }}>
+                                {getSOv(sid, 'start', session.start)}
+                              </EditHint>
+                            )}
+                            <span style={{ color: 'rgba(255,255,255,.45)' }}>–{session.end} · </span>
+                            <b style={{ color: 'var(--paper)' }}>{sessionMins}min</b>
+                          </span>
+                          <button onClick={() => removePractice(sid)} style={{ background: 'rgba(255,255,255,.08)', border: 0, color: 'rgba(255,255,255,.5)', cursor: 'pointer', fontSize: 14, padding: '1px 6px', lineHeight: 1, borderRadius: 4 }} title="Remove this session">×</button>
+                        </div>
 
-                            {/* LEAD */}
-                            <td style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--ink-soft)' }}>
-                              {isEd(iso, idx, 'lead') ? (
-                                <select autoFocus defaultValue={effLead}
-                                  style={{ ...inlineInput(), fontSize: 11, fontFamily: 'var(--font-mono)', maxWidth: 108 }}
-                                  onChange={e => { setOv(iso, idx, 'lead', e.target.value); stopEd(); }}
-                                  onBlur={stopEd}
-                                >
-                                  {COACH_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
-                                </select>
-                              ) : (
-                                <EditHint mono onClick={() => startEd(iso, idx, 'lead')} title="Click to change lead coach" style={{ fontSize: 11, color: 'var(--ink-soft)' }}>
-                                  {effLead}
-                                </EditHint>
-                              )}
-                            </td>
+                        {/* ── Editable drill table ── */}
+                        {drillRows.length > 0 && (
+                          <table className="table" style={{ margin: 0, borderRadius: 0 }}>
+                            <thead style={{ background: 'rgba(24,43,84,.06)' }}>
+                              <tr>
+                                <th style={{ width: 52, color: 'var(--primary)', fontWeight: 800 }}>Start</th>
+                                <th style={{ width: 56, color: 'var(--primary)', fontWeight: 800 }}>Dur.</th>
+                                <th style={{ width: 154, color: 'var(--primary)', fontWeight: 800 }}>Facet · Focus</th>
+                                <th style={{ color: 'var(--primary)', fontWeight: 800 }}>Drill / Activity</th>
+                                <th style={{ width: 102, color: 'var(--primary)', fontWeight: 800 }}>Lead</th>
+                                <th style={{ width: 102, color: 'var(--primary)', fontWeight: 800 }}>Assist</th>
+                                <th style={{ width: 72, color: 'var(--primary)', fontWeight: 800 }}>Priority</th>
+                                <th style={{ width: 24 }}></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {drillRows.map(({ drill, idx, startTime, effMin, effCat, effFocus, effName, effDesc, effLead, effAssist, effPriority, effPriorityLbl, col }) => (
+                                <tr key={`${sid}-${idx}`} style={{ background: col.bg }}>
+                                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--ink-soft)', borderLeft: '3px solid ' + col.border, paddingLeft: 8 }}>{startTime}</td>
+                                  <td>
+                                    {isEd(sid, idx, 'min') ? (
+                                      <input autoFocus type="number" min="5" max="120" defaultValue={effMin}
+                                        style={{ ...inlineInput(), width: 46, fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 12 }}
+                                        onBlur={e => { setOv(sid, idx, 'min', Math.max(5, Number(e.target.value) || effMin)); stopEd(); }}
+                                        onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'Escape') stopEd(); }}
+                                      />
+                                    ) : (
+                                      <EditHint mono onClick={() => startEd(sid, idx, 'min')} title="Click to edit duration" style={{ fontWeight: 700, fontSize: 12 }}>{effMin}m</EditHint>
+                                    )}
+                                  </td>
+                                  <td>
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 5 }}>
+                                      <span className="cat-pill" onClick={() => startEd(sid, idx, 'cat')} title="Click to change category"
+                                        style={{ background: col.border, color: '#fff', fontSize: 8, fontWeight: 700, letterSpacing: '.04em', flexShrink: 0, cursor: 'pointer', marginTop: 1 }}>
+                                        {CAT_ABBR(effCat)}
+                                      </span>
+                                      <div style={{ flex: 1, minWidth: 0 }}>
+                                        {isEd(sid, idx, 'cat') ? (
+                                          <select autoFocus defaultValue={effCat} style={{ ...inlineInput(), fontSize: 10, marginBottom: 3, maxWidth: 108 }}
+                                            onChange={e => { setOv(sid, idx, 'cat', e.target.value); stopEd(); }} onBlur={stopEd}>
+                                            {DRILL_CATS.map(c => <option key={c} value={c}>{c}</option>)}
+                                          </select>
+                                        ) : (
+                                          <EditHint onClick={() => startEd(sid, idx, 'cat')} title="Click to change category" style={{ fontSize: 10, fontWeight: 600, color: col.fg, display: 'block', marginBottom: 2 }}>{effCat}</EditHint>
+                                        )}
+                                        {isEd(sid, idx, 'focus') ? (
+                                          <input autoFocus defaultValue={effFocus} placeholder="Focus cue…"
+                                            style={{ ...inlineInput(), width: 100, fontSize: 10, fontStyle: 'italic' }}
+                                            onBlur={e => { setOv(sid, idx, 'focus', e.target.value); stopEd(); }}
+                                            onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'Escape') stopEd(); }}
+                                          />
+                                        ) : (
+                                          <EditHint onClick={() => startEd(sid, idx, 'focus')} title="Click to edit focus cue" style={{ fontSize: 10, color: 'var(--ink-soft)', fontStyle: 'italic', display: 'block', minHeight: 14 }}>
+                                            {effFocus || <span style={{ color: 'var(--muted)' }}>+ focus</span>}
+                                          </EditHint>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td>
+                                    {isEd(sid, idx, 'name') ? (
+                                      <input autoFocus defaultValue={effName}
+                                        style={{ ...inlineInput(), width: '100%', fontWeight: 700, fontSize: 13, marginBottom: 3 }}
+                                        onBlur={e => { setOv(sid, idx, 'name', e.target.value.trim() || effName); stopEd(); }}
+                                        onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'Escape') stopEd(); }}
+                                      />
+                                    ) : (
+                                      <EditHint onClick={() => startEd(sid, idx, 'name')} title="Click to edit drill name" style={{ fontWeight: 700, fontSize: 13, marginBottom: 2, display: 'inline-block' }}>
+                                        {effName}{drill.custom && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--accent-2)', fontWeight: 700, marginLeft: 5 }}>CUSTOM</span>}
+                                      </EditHint>
+                                    )}
+                                    {isEd(sid, idx, 'desc') ? (
+                                      <textarea autoFocus defaultValue={effDesc} placeholder="Describe this drill…" rows={3}
+                                        style={{ ...inlineInput(), width: '100%', fontSize: 11, lineHeight: 1.4, resize: 'vertical', fontFamily: 'var(--font-body)', display: 'block', marginTop: 2 }}
+                                        onBlur={e => { setOv(sid, idx, 'desc', e.target.value); stopEd(); }}
+                                        onKeyDown={e => { if (e.key === 'Escape') stopEd(); }}
+                                      />
+                                    ) : (
+                                      <EditHint onClick={() => startEd(sid, idx, 'desc')} title="Click to edit description" style={{ fontSize: 11, fontWeight: 500, color: 'var(--ink-soft)', lineHeight: 1.4, display: 'block', minHeight: 16 }}>
+                                        {effDesc || <span style={{ color: 'var(--muted)', fontStyle: 'italic' }}>+ description</span>}
+                                      </EditHint>
+                                    )}
+                                    {drill.calls && drill.calls.length > 0 && (
+                                      <div style={{ display: 'flex', gap: 3, marginTop: 4, flexWrap: 'wrap' }}>
+                                        {drill.calls.map(c => <span key={c} style={{ fontFamily: 'var(--font-mono)', fontSize: 8, fontWeight: 700, letterSpacing: '.06em', padding: '1px 4px', borderRadius: 2, background: 'rgba(24,43,84,.08)', color: 'var(--primary)' }}>{c}</span>)}
+                                      </div>
+                                    )}
+                                  </td>
+                                  <td style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--ink-soft)' }}>
+                                    {isEd(sid, idx, 'lead') ? (
+                                      <select autoFocus defaultValue={effLead} style={{ ...inlineInput(), fontSize: 11, fontFamily: 'var(--font-mono)', maxWidth: 108 }}
+                                        onChange={e => { setOv(sid, idx, 'lead', e.target.value); stopEd(); }} onBlur={stopEd}>
+                                        {COACH_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+                                      </select>
+                                    ) : (
+                                      <EditHint mono onClick={() => startEd(sid, idx, 'lead')} title="Click to change lead coach" style={{ fontSize: 11, color: 'var(--ink-soft)' }}>{effLead}</EditHint>
+                                    )}
+                                  </td>
+                                  <td style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--muted)' }}>
+                                    {isEd(sid, idx, 'assist') ? (
+                                      <select autoFocus defaultValue={effAssist} style={{ ...inlineInput(), fontSize: 11, fontFamily: 'var(--font-mono)', maxWidth: 108 }}
+                                        onChange={e => { setOv(sid, idx, 'assist', e.target.value); stopEd(); }} onBlur={stopEd}>
+                                        {COACH_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+                                      </select>
+                                    ) : (
+                                      <EditHint mono onClick={() => startEd(sid, idx, 'assist')} title="Click to change assist coach" style={{ fontSize: 11, color: 'var(--muted)' }}>{effAssist}</EditHint>
+                                    )}
+                                  </td>
+                                  <td>
+                                    <span onClick={() => { const next = PRIORITY_ORDER[(PRIORITY_ORDER.indexOf(effPriorityLbl) + 1) % PRIORITY_ORDER.length]; setOv(sid, idx, 'priority', next); }} title="Click to change priority"
+                                      style={{ display: 'inline-block', fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 9, letterSpacing: '.05em', padding: '2px 7px', borderRadius: 4, background: effPriority.bg, color: effPriority.fg, cursor: 'pointer', userSelect: 'none', transition: 'opacity .1s' }}
+                                      onMouseEnter={e => e.currentTarget.style.opacity = '.7'} onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
+                                      {effPriority.label}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <button onClick={() => removeDrill(sid, drill.id)} style={{ background: 'transparent', border: 0, color: 'var(--muted)', cursor: 'pointer', fontSize: 13, padding: 0, lineHeight: 1 }}>×</button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
 
-                            {/* ASSIST */}
-                            <td style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--muted)' }}>
-                              {isEd(iso, idx, 'assist') ? (
-                                <select autoFocus defaultValue={effAssist}
-                                  style={{ ...inlineInput(), fontSize: 11, fontFamily: 'var(--font-mono)', maxWidth: 108 }}
-                                  onChange={e => { setOv(iso, idx, 'assist', e.target.value); stopEd(); }}
-                                  onBlur={stopEd}
-                                >
-                                  {COACH_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
-                                </select>
-                              ) : (
-                                <EditHint mono onClick={() => startEd(iso, idx, 'assist')} title="Click to change assist coach" style={{ fontSize: 11, color: 'var(--muted)' }}>
-                                  {effAssist}
-                                </EditHint>
-                              )}
-                            </td>
+                        {/* Per-session drop zone */}
+                        <div
+                          style={{ padding: '6px 14px', fontSize: 11, textAlign: 'center', borderTop: '1px dashed var(--line)', color: isSessionDrop ? 'var(--primary)' : 'var(--muted)', background: isSessionDrop ? 'var(--primary-soft)' : undefined, fontStyle: 'italic' }}
+                          onDragOver={e => { e.preventDefault(); e.stopPropagation(); setDropSessionId(sid); setDropDate(null); }}
+                          onDragLeave={e => { e.stopPropagation(); setDropSessionId(null); }}
+                          onDrop={e => {
+                            e.preventDefault(); e.stopPropagation();
+                            const data = e.dataTransfer.getData('text/plain');
+                            if (data.startsWith('TEMPLATE:')) {
+                              data.slice('TEMPLATE:'.length).split(',').forEach(did => addDrillToSession(sid, did));
+                            } else if (data) {
+                              addDrillToSession(sid, data);
+                            }
+                            setDropSessionId(null); setDraggingDrill(null);
+                          }}
+                        >
+                          {isSessionDrop ? '↓ Drop to add drill' : '+ drop a drill here'}
+                        </div>
+                      </div>
+                    );
+                  })}
 
-                            {/* PRIORITY — click cycles KEY → IMPORT. → SUPP. */}
-                            <td>
-                              <span
-                                onClick={() => {
-                                  const next = PRIORITY_ORDER[(PRIORITY_ORDER.indexOf(effPriorityLbl) + 1) % PRIORITY_ORDER.length];
-                                  setOv(iso, idx, 'priority', next);
-                                }}
-                                title="Click to change priority"
-                                style={{
-                                  display: 'inline-block',
-                                  fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 9,
-                                  letterSpacing: '.05em', padding: '2px 7px', borderRadius: 4,
-                                  background: effPriority.bg, color: effPriority.fg,
-                                  cursor: 'pointer', userSelect: 'none', transition: 'opacity .1s',
-                                }}
-                                onMouseEnter={e => e.currentTarget.style.opacity = '.7'}
-                                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-                              >
-                                {effPriority.label}
-                              </span>
-                            </td>
-
-                            {/* REMOVE */}
-                            <td>
-                              <button onClick={() => removeDrill(iso, drill.id)} style={{ background: 'transparent', border: 0, color: 'var(--muted)', cursor: 'pointer', fontSize: 13, padding: 0, lineHeight: 1 }}>×</button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-
-                  {/* Drop footer */}
-                  {(session || dropping) && (
-                    <div style={{ padding: '6px 14px', fontSize: 11, textAlign: 'center', borderTop: '1px dashed var(--line)', color: dropping ? 'var(--primary)' : 'var(--muted)', background: dropping ? 'var(--primary-soft)' : undefined, fontStyle: 'italic' }}>
-                      {dropping ? '↓ Drop to add drill' : '+ drop a drill here'}
-                    </div>
-                  )}
+                  {/* ── Day footer — add session button ── */}
+                  <div style={{ padding: '5px 10px', borderTop: daySessions.length > 0 ? '1px dashed rgba(24,43,84,.12)' : 'none', display: 'flex' }}>
+                    {daySessions.length > 0 ? (
+                      <button
+                        className="btn sm"
+                        onClick={() => addSession(iso, 'New session', daySessions.length > 0 ? '' : '18:30')}
+                        style={{ flex: 1, justifyContent: 'center', fontSize: 11, padding: '5px 8px', opacity: .72, transition: 'opacity .12s' }}
+                        onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+                        onMouseLeave={e => e.currentTarget.style.opacity = '.72'}
+                      >⊕ Add session</button>
+                    ) : (
+                      !isMatch && !dayDropping && (
+                        <span style={{ fontSize: 11, color: 'var(--muted)', fontStyle: 'italic', padding: '3px 4px' }}>Rest day</span>
+                      )
+                    )}
+                  </div>
                 </div>
               );
             })}

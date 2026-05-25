@@ -263,7 +263,7 @@ const usePractices = () => {
       const raw = localStorage.getItem(PRACTICE_KEY);
       if (raw) return JSON.parse(raw);
     } catch (e) {}
-    return SEED_PRACTICES;
+    return []; /* fresh install — coach builds their own calendar */
   });
 
   const setPractices = React.useCallback((next) => {
@@ -290,12 +290,13 @@ const usePractices = () => {
     });
   };
 
+  /* Add a drill to the FIRST session on a given date — creates session if none */
   const addDrill = (iso, drillId) => {
     setPractices(prev => {
       const existing = prev.find(p => p.date === iso);
       if (existing) {
         if (existing.drills.includes(drillId)) return prev;
-        return prev.map(p => p.date === iso ? { ...p, drills: [...p.drills, drillId] } : p);
+        return prev.map(p => p.id === existing.id ? { ...p, drills: [...p.drills, drillId] } : p);
       }
       return [...prev, {
         id: `p_${Date.now()}`,
@@ -305,18 +306,42 @@ const usePractices = () => {
     });
   };
 
-  const removeDrill = (iso, drillId) => {
+  /* Add a drill to a SPECIFIC session by session ID */
+  const addDrillToSession = (sessionId, drillId) => {
+    setPractices(prev => prev.map(p => {
+      if (p.id !== sessionId) return p;
+      if (p.drills.includes(drillId)) return p;
+      return { ...p, drills: [...p.drills, drillId] };
+    }));
+  };
+
+  /* Remove a drill from a session by session ID */
+  const removeDrill = (sessionId, drillId) => {
     setPractices(prev => prev.map(p =>
-      p.date === iso ? { ...p, drills: p.drills.filter(d => d !== drillId) } : p
+      p.id === sessionId ? { ...p, drills: p.drills.filter(d => d !== drillId) } : p
     ));
   };
 
-  const removePractice = (iso) =>
-    setPractices(prev => prev.filter(p => p.date !== iso));
+  /* Remove a specific session by session ID */
+  const removePractice = (sessionId) =>
+    setPractices(prev => prev.filter(p => p.id !== sessionId));
+
+  /* Always create a new session (no dedup) — used by "Add session" button */
+  const addSession = (iso, focus = 'New session', start = '18:30') => {
+    setPractices(prev => [...prev, {
+      id: `p_${Date.now()}`,
+      date: iso, start, end: '20:00',
+      focus, drills: [],
+    }]);
+  };
+
+  /* Create a session from the calendar inline add (also always creates) */
+  const createSession = (iso, focus = 'New practice', start = '18:30') =>
+    addSession(iso, focus, start);
 
   const resetSeed = () => setPractices(SEED_PRACTICES);
 
-  return { practices, setPractices, upsertPractice, addDrill, removeDrill, removePractice, resetSeed };
+  return { practices, setPractices, upsertPractice, addDrill, addDrillToSession, removeDrill, removePractice, addSession, createSession, resetSeed };
 };
 
 Object.assign(window, {

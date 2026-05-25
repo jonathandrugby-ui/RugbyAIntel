@@ -1,4 +1,4 @@
-/* RugbyAI mid-fi — App router + Playbook + tweaks */
+/* RugbyAI mid-fi — App router + tweaks */
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "palette": "pumas",
@@ -9,8 +9,8 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 const CRUMBS = {
   dashboard: <>Workspace / <b>Season</b></>,
   squad:     <>Workspace / <b>Squad</b></>,
-  match:     <>Workspace / Match Day / <b>vs UCT</b></>,
-  ratings:   <>Workspace / Match Day / <b>Ratings · Rocklands</b></>,
+  match:     <>Workspace / Match Day / <b>Fixtures</b></>,
+  ratings:   <>Workspace / Match Day / <b>Ratings</b></>,
   calendar:  <>Workspace / <b>Calendar</b></>,
   practice:  <>Workspace / Calendar / <b>Practice planner</b></>,
   opponent:  <>Workspace / <b>Opponent Intel</b></>,
@@ -26,13 +26,32 @@ const CRUMBS = {
 };
 
 const App = () => {
+  /* ── Team setup store ── */
+  const setup = useTeamSetup();
+
+  /* ── Routing — default to onboarding when no team is set up ── */
   const [route, setRoute] = React.useState(() => {
+    if (!setup.hasSetup) return 'onboarding';
     const u = new URL(window.location.href);
     return u.searchParams.get('r') || 'dashboard';
   });
   const [focusPracticeDate, setFocusPracticeDate] = React.useState(null);
 
-  /* Sidebar open/closed — persisted in localStorage */
+  /* When setup changes (reset → re-onboard) force onboarding route */
+  React.useEffect(() => {
+    if (!setup.hasSetup) setRoute('onboarding');
+  }, [setup.hasSetup]);
+
+  /* Apply custom brand colours whenever teamInfo changes */
+  React.useEffect(() => {
+    if (setup.hasSetup && setup.teamInfo?.primary && setup.teamInfo?.accent) {
+      document.documentElement.style.setProperty('--primary',      setup.teamInfo.primary);
+      document.documentElement.style.setProperty('--primary-soft', setup.teamInfo.primary + '18');
+      document.documentElement.style.setProperty('--accent',       setup.teamInfo.accent);
+    }
+  }, [setup.hasSetup, setup.teamInfo]);
+
+  /* ── Sidebar open/closed — persisted in localStorage ── */
   const [sidebarOpen, setSidebarOpen] = React.useState(() => {
     try { return localStorage.getItem('rugbyai-sidebar') !== 'closed'; }
     catch { return true; }
@@ -60,33 +79,65 @@ const App = () => {
   const navTo = (id) => { setRoute(id); setFocusPracticeDate(null); };
   const jumpToPractice = (iso) => { setFocusPracticeDate(iso); setRoute('practice'); };
 
+  /* Called by Onboarding Done step */
+  const handleSetupComplete = (team, squad, fixtures) => {
+    setup.commitSetup(team, squad, fixtures);
+    navTo('dashboard');
+  };
+
+  /* Full reset — clears all data and returns to onboarding */
+  const handleReset = () => {
+    setup.resetSetup();
+    store.resetSeed(); // also clears practices localStorage key
+    /* Clear practice store */
+    try { localStorage.removeItem('rugbyai_practices_v1'); } catch {}
+  };
+
+  /* Onboarding is full-screen — hide sidebar/nav */
+  const isOnboarding = route === 'onboarding';
+
   return (
     <div
       className="app-shell"
       data-screen-label={`Mid-Fi · ${route}`}
-      data-sidebar={sidebarOpen ? 'open' : 'closed'}
+      data-sidebar={isOnboarding ? 'closed' : (sidebarOpen ? 'open' : 'closed')}
     >
-      <Sidebar active={route} onNav={navTo} onCollapse={toggleSidebar} />
-      <main className="main">
-        <TopBar
-          crumb={CRUMBS[route]}
-          sidebarOpen={sidebarOpen}
-          onToggleSidebar={toggleSidebar}
+      {!isOnboarding && (
+        <Sidebar
+          active={route}
+          onNav={navTo}
+          onCollapse={toggleSidebar}
+          teamInfo={setup.teamInfo}
+          squadCount={SQUAD.length}
         />
+      )}
+
+      <main className="main">
+        {!isOnboarding && (
+          <TopBar
+            crumb={CRUMBS[route]}
+            sidebarOpen={sidebarOpen}
+            onToggleSidebar={toggleSidebar}
+          />
+        )}
+
         {route === 'dashboard'  && <Dashboard />}
         {route === 'squad'      && <Squad />}
-        {route === 'match'      && <MatchDay />}
+        {route === 'match'      && <MatchDay onNav={navTo} />}
         {route === 'ratings'    && <Ratings />}
         {route === 'calendar'   && (
           <SeasonCalendar
             practices={store.practices}
             jumpToPractice={jumpToPractice}
+            addPractice={store.createSession}
           />
         )}
         {route === 'practice'   && (
           <PracticePlanner
             practices={store.practices}
             addDrill={store.addDrill}
+            addDrillToSession={store.addDrillToSession}
+            addSession={store.addSession}
             removeDrill={store.removeDrill}
             removePractice={store.removePractice}
             resetSeed={store.resetSeed}
@@ -102,11 +153,13 @@ const App = () => {
         {route === 'workload'   && <WorkloadRisk />}
         {route === 'breakdown'  && <BreakdownEfficiency />}
         {route === 'analyst'    && <Analyst />}
-        {route === 'onboarding' && <Onboarding />}
+        {route === 'onboarding' && (
+          <Onboarding onComplete={handleSetupComplete} />
+        )}
       </main>
 
-      {/* Mobile bottom tab navigation */}
-      <MobileNav active={route} onNav={navTo} />
+      {/* Mobile bottom tab navigation — hidden during onboarding */}
+      {!isOnboarding && <MobileNav active={route} onNav={navTo} />}
 
       {/* Floating AI chat widget — accessible from any screen */}
       <AIChat />
@@ -157,28 +210,29 @@ const App = () => {
           />
         </TweakSection>
 
-        <TweakSection label="Practice store">
-          <TweakButton onClick={store.resetSeed}>↺ Reset to seed practices</TweakButton>
+        <TweakSection label="Data">
+          <TweakButton onClick={handleReset}>↺ Clear all data — restart onboarding</TweakButton>
+          <TweakButton onClick={store.resetSeed}>↺ Reset practice sessions to seed data</TweakButton>
         </TweakSection>
 
         <TweakSection label="Jump to screen" />
         {Object.entries({
-          dashboard: '◆ Season Dashboard',
-          squad: '◇ Squad List',
-          match: '▣ Match Day',
-          ratings: '★ Match Ratings',
-          calendar: '▦ Season Calendar',
-          practice: '◔ Practice Planner',
-          opponent: '◉ Opponent Intel',
-          video: '▶ Video Clips',
-          playbook: '☰ Playbook',
-          tactical: '◈ Tactical Intel',
-          setpiece: '⬆ Set Piece Trends',
-          kicking: '◎ Kicking & Territory',
-          workload: '◑ Workload & Fatigue',
-          breakdown: '⊕ Breakdown',
-          analyst: '✦ Analyst (AI)',
-          onboarding: '✿ Onboarding',
+          dashboard:   '◆ Season Dashboard',
+          squad:       '◇ Squad List',
+          match:       '▣ Match Day',
+          ratings:     '★ Match Ratings',
+          calendar:    '▦ Season Calendar',
+          practice:    '◔ Practice Planner',
+          opponent:    '◉ Opponent Intel',
+          video:       '▶ Video Clips',
+          playbook:    '☰ Playbook',
+          tactical:    '◈ Tactical Intel',
+          setpiece:    '⬆ Set Piece Trends',
+          kicking:     '◎ Kicking & Territory',
+          workload:    '◑ Workload & Fatigue',
+          breakdown:   '⊕ Breakdown',
+          analyst:     '✦ Analyst (AI)',
+          onboarding:  '✿ New season setup',
         }).map(([k, label]) => (
           <TweakButton key={k} onClick={() => navTo(k)}>{label}</TweakButton>
         ))}

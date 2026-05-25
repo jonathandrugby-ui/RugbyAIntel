@@ -1,6 +1,6 @@
 /* RugbyAI mid-fi — Season Calendar */
 
-const SeasonCalendar = ({ practices, jumpToPractice }) => {
+const SeasonCalendar = ({ practices, jumpToPractice, addPractice }) => {
   const [view, setView] = React.useState('season'); // season | month | list
   const [monthIdx, setMonthIdx] = React.useState(5); // June default
   const [showMatches, setShowMatches] = React.useState(true);
@@ -98,6 +98,7 @@ const SeasonCalendar = ({ practices, jumpToPractice }) => {
           showMatches={showMatches}
           showPractices={showPractices}
           jumpToPractice={jumpToPractice}
+          addPractice={addPractice}
         />
       )}
       {view === 'list' && (
@@ -221,9 +222,27 @@ const MiniMonth = ({ year, month, eventsByDate, showMatches, showPractices }) =>
 /* ============================================================
    Month view — single big calendar
    ============================================================ */
-const MonthView = ({ monthIdx, eventsByDate, showMatches, showPractices, jumpToPractice }) => {
+const MonthView = ({ monthIdx, eventsByDate, showMatches, showPractices, jumpToPractice, addPractice }) => {
   const days = daysInMonth(SEASON_YEAR, monthIdx);
   const firstDay = firstDayOfMonth(SEASON_YEAR, monthIdx);
+
+  /* Inline "add practice" state */
+  const [addingDay, setAddingDay] = React.useState(null); // iso
+  const [addFocus, setAddFocus]   = React.useState('');
+  const [addStart, setAddStart]   = React.useState('18:30');
+  const [hoveredDay, setHoveredDay] = React.useState(null);
+
+  const openAdd = (iso) => {
+    setAddingDay(iso);
+    setAddFocus('');
+    setAddStart('18:30');
+  };
+  const cancelAdd = (e) => { e && e.stopPropagation(); setAddingDay(null); };
+  const confirmAdd = (iso, e) => {
+    e && e.stopPropagation();
+    if (addPractice) addPractice(iso, addFocus.trim() || 'Practice session', addStart);
+    setAddingDay(null);
+  };
 
   const cells = [];
   for (let i = 0; i < firstDay; i++) cells.push({ empty: true });
@@ -253,6 +272,9 @@ const MonthView = ({ monthIdx, eventsByDate, showMatches, showPractices, jumpToP
           const match = showMatches ? c.events.find(e => e.kind === 'match') : null;
           const practice = showPractices ? c.events.find(e => e.kind === 'practice') : null;
           const weekend = c.dow === 0 || c.dow === 6;
+          const isAdding = addingDay === c.iso;
+          const canAdd = !match && !practice && addPractice;
+
           return (
             <div
               key={i}
@@ -261,12 +283,30 @@ const MonthView = ({ monthIdx, eventsByDate, showMatches, showPractices, jumpToP
                 match ? 'has-match' : '',
                 weekend && !match ? 'weekend' : '',
                 c.today ? 'today' : '',
+                isAdding ? 'adding-practice' : '',
               ].filter(Boolean).join(' ')}
+              onMouseEnter={() => canAdd && setHoveredDay(c.iso)}
+              onMouseLeave={() => setHoveredDay(null)}
+              style={isAdding ? { outline: '2px solid var(--primary)', outlineOffset: -2, background: 'var(--primary-soft)' } : undefined}
             >
               <div className="row between">
                 <span className="num">{c.d}</span>
-                <span className="day-label">{DAY_NAMES_SHORT[c.dow]}</span>
+                {canAdd && hoveredDay === c.iso && !isAdding ? (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); openAdd(c.iso); }}
+                    title="Add practice session"
+                    style={{
+                      background: 'var(--primary)', color: '#fff', border: 'none',
+                      borderRadius: 4, width: 18, height: 18, fontSize: 13, lineHeight: '18px',
+                      cursor: 'pointer', padding: 0, fontWeight: 700, display: 'flex',
+                      alignItems: 'center', justifyContent: 'center',
+                    }}
+                  >+</button>
+                ) : (
+                  <span className="day-label">{DAY_NAMES_SHORT[c.dow]}</span>
+                )}
               </div>
+
               {match && (
                 <div className="cal-event match">
                   <span>{match.f.venue === 'HOME' ? '🏟' : '✈'}</span>
@@ -286,6 +326,63 @@ const MonthView = ({ monthIdx, eventsByDate, showMatches, showPractices, jumpToP
                   </span>
                 </div>
               )}
+
+              {/* ── Inline add-practice form ── */}
+              {isAdding && (
+                <div
+                  style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}
+                  onClick={e => e.stopPropagation()}
+                >
+                  <input
+                    autoFocus
+                    placeholder="Session name…"
+                    value={addFocus}
+                    onChange={e => setAddFocus(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') confirmAdd(c.iso, e);
+                      if (e.key === 'Escape') cancelAdd(e);
+                    }}
+                    style={{
+                      width: '100%', boxSizing: 'border-box',
+                      padding: '3px 6px', borderRadius: 4,
+                      border: '1px solid var(--primary)', outline: 'none',
+                      fontSize: 11, fontFamily: 'inherit', fontWeight: 600,
+                      background: '#fff',
+                    }}
+                  />
+                  <div style={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                    <input
+                      type="time"
+                      value={addStart}
+                      onChange={e => setAddStart(e.target.value)}
+                      style={{
+                        flex: 1, padding: '2px 4px', borderRadius: 4,
+                        border: '1px solid var(--line)', outline: 'none',
+                        fontSize: 10, fontFamily: 'var(--font-mono)',
+                        background: '#fff',
+                      }}
+                    />
+                    <button
+                      onClick={e => confirmAdd(c.iso, e)}
+                      style={{
+                        background: 'var(--primary)', color: '#fff',
+                        border: 'none', borderRadius: 4,
+                        padding: '2px 7px', fontSize: 10, fontWeight: 700,
+                        cursor: 'pointer', whiteSpace: 'nowrap',
+                      }}
+                    >Add</button>
+                    <button
+                      onClick={cancelAdd}
+                      style={{
+                        background: 'transparent', color: 'var(--muted)',
+                        border: '1px solid var(--line)', borderRadius: 4,
+                        padding: '2px 5px', fontSize: 10, cursor: 'pointer',
+                      }}
+                    >×</button>
+                  </div>
+                </div>
+              )}
+
               {c.today && <Badge variant="ink" style={{ position: 'absolute', bottom: 6, right: 6 }}>today</Badge>}
             </div>
           );
@@ -297,7 +394,7 @@ const MonthView = ({ monthIdx, eventsByDate, showMatches, showPractices, jumpToP
           <Badge variant="outline"><span className="dot" style={{ background: 'var(--ink)' }} />Practice</Badge>
           <Badge><span className="dot" style={{ background: 'var(--primary)' }} />Today</Badge>
         </div>
-        <span className="muted" style={{ fontSize: 12 }}>Click a practice to open it in the planner</span>
+        <span className="muted" style={{ fontSize: 12 }}>Click a practice to open · hover an empty day to add</span>
       </div>
     </div>
   );
