@@ -18,7 +18,7 @@ const _AI_RULES = [
   {
     match: /\b(form|results?|season|record|wins?|losses?|points?|score|how.*(we|team)|stats?)\b/i,
     response: () => {
-      const played  = FIXTURES.filter(f => f.result && !f.upcoming);
+      const played  = FIXTURES.filter(f => f.result && !f);
       const wins    = played.filter(f => f.result === 'W').length;
       const losses  = played.filter(f => f.result === 'L').length;
       const ptsFor  = played.reduce((s,f)=>s+(f.f||0),0);

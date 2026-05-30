@@ -201,7 +201,7 @@ const TacticalIntelligence = () => {
 
   const probColor = WIN_PROB >= 50 ? 'var(--ok)' : WIN_PROB >= 35 ? 'var(--accent-2)' : 'var(--warn)';
 
-  const next = FIXTURES.find(f => f.upcoming);
+  const next = FIXTURES.find(f => !f.result);
 
   return (
     <div className="page" style={{ paddingBottom: 60 }}>
@@ -211,7 +211,7 @@ const TacticalIntelligence = () => {
         <div>
           <div className="eyebrow">Predictive Intelligence · Match Briefing</div>
           <h1>Tactical Recommendations</h1>
-          <div className="meta">vs {next.opp} · {next.date} · {next.venue} · 15:00 kickoff</div>
+          <div className="meta">vs {next?.opp} · {next?.date} · {next?.venue} · 15:00 kickoff</div>
         </div>
         <div className="row gap-3">
           <button className="btn">Export briefing</button>

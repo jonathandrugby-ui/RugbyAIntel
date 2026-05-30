@@ -340,21 +340,172 @@ const MatchDayQuickLinks = ({ onNav }) => (
   </div>
 );
 
+/* ---- Add Fixture modal (inline, no external dependencies) ---- */
+const _md_inp = { width:'100%', padding:'8px 10px', border:'1px solid var(--border)', borderRadius:8, fontSize:14, fontFamily:'inherit', boxSizing:'border-box', background:'#fff' };
+
+const AddFixtureModal = ({ onClose, onSaved }) => {
+  const [tab, setTab] = React.useState('manual'); // manual | csv | paste
+  const [rows, setRows] = React.useState([{ type:'League', opp:'', venue:'HOME', date:'', kickoff:'15:00' }]);
+  const [csv, setCsv] = React.useState('');
+  const [paste, setPaste] = React.useState('');
+  const [saved, setSaved] = React.useState(false);
+
+  const addRow = () => setRows(r => [...r, { type:'League', opp:'', venue:'HOME', date:'', kickoff:'15:00' }]);
+  const upd = (i, k, v) => setRows(r => r.map((row,idx) => idx===i ? {...row,[k]:v} : row));
+
+  const parseAndSave = (fixtures) => {
+    const valid = fixtures.filter(f => f.opp && f.date);
+    if (!valid.length) { alert('No valid fixtures found.'); return; }
+    valid.forEach(f => FIXTURES.push(f));
+    window.FIXTURES = FIXTURES;
+    try {
+      const raw = localStorage.getItem('rugbyai_team_v2');
+      if (raw) { const d = JSON.parse(raw); d.fixtures = FIXTURES; localStorage.setItem('rugbyai_team_v2', JSON.stringify(d)); }
+    } catch {}
+    setSaved(true);
+    setTimeout(() => { onSaved(); onClose(); }, 1200);
+  };
+
+  const saveManual = () => parseAndSave(rows);
+  const saveCSV = () => {
+    const lines = csv.trim().split('\n').filter(Boolean);
+    const fixtures = lines.map(line => {
+      const [opp='', venue='HOME', date='', kickoff='15:00', type='League'] = line.split(',').map(s=>s.trim().replace(/^"|"$/g,''));
+      return { type, opp, venue: /away/i.test(venue)?'AWAY':'HOME', date, kickoff };
+    });
+    parseAndSave(fixtures);
+  };
+  const savePaste = () => {
+    // Simple heuristic: find lines with a date-like pattern
+    const lines = paste.trim().split('\n').filter(Boolean);
+    const fixtures = lines.map(line => {
+      const dateMatch = line.match(/\b(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))\b/i);
+      const venueMatch = /home/i.test(line) ? 'HOME' : /away/i.test(line) ? 'AWAY' : 'HOME';
+      const opp = line.replace(dateMatch?.[0]:'', '').replace(/home|away|\d{1,2}:\d{2}/gi, '').replace(/[–\-|·vs\.]/g,' ').trim().replace(/\s+/g,' ');
+      return { type:'League', opp: opp||'Unknown', venue: venueMatch, date: dateMatch?.[0]||line.slice(0,10), kickoff:'15:00' };
+    }).filter(f => f.date);
+    parseAndSave(fixtures);
+  };
+
+  return (
+    <div onClick={onClose} style={{ position:'fixed',inset:0,background:'rgba(0,0,0,.45)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:20 }}>
+      <div onClick={e=>e.stopPropagation()} style={{ background:'var(--paper)',borderRadius:14,width:'100%',maxWidth:580,maxHeight:'90vh',overflowY:'auto',boxShadow:'0 20px 60px rgba(0,0,0,.3)' }}>
+        <div style={{ padding:'22px 24px 0',display:'flex',justifyContent:'space-between',alignItems:'center' }}>
+          <div style={{ fontFamily:'var(--font-display)',fontSize:20,fontWeight:700 }}>Add fixtures</div>
+          <button onClick={onClose} style={{ background:'none',border:'none',fontSize:22,cursor:'pointer',color:'var(--muted)' }}>×</button>
+        </div>
+
+        {saved ? (
+          <div style={{ padding:'32px 24px',textAlign:'center' }}>
+            <div style={{ fontSize:40,marginBottom:8 }}>✓</div>
+            <div style={{ fontFamily:'var(--font-display)',fontSize:18,fontWeight:700 }}>Fixtures added!</div>
+          </div>
+        ) : (
+          <div style={{ padding:'16px 24px 24px' }}>
+            {/* Tab bar */}
+            <div style={{ display:'flex',gap:0,background:'var(--sand)',borderRadius:10,padding:3,marginBottom:16 }}>
+              {[['manual','✎ Enter manually'],['csv','CSV upload'],['paste','Paste text']].map(([t,l]) => (
+                <button key={t} onClick={()=>setTab(t)} style={{ flex:1,border:'none',borderRadius:8,padding:'7px 0',fontSize:13,fontWeight:600,cursor:'pointer',background:tab===t?'#fff':'transparent',boxShadow:tab===t?'0 1px 4px rgba(0,0,0,.12)':'none',color:tab===t?'var(--primary)':'var(--ink-soft)',transition:'.15s' }}>{l}</button>
+              ))}
+            </div>
+
+            {tab === 'manual' && (
+              <div>
+                <div style={{ fontSize:12,color:'var(--muted)',marginBottom:10 }}>Enter each fixture. CSV format accepted on import.</div>
+                {rows.map((row,i) => (
+                  <div key={i} style={{ display:'grid',gridTemplateColumns:'1fr 80px 100px 80px',gap:8,marginBottom:8,alignItems:'center' }}>
+                    <input style={_md_inp} placeholder="Opposition team" value={row.opp} onChange={e=>upd(i,'opp',e.target.value)} />
+                    <select style={_md_inp} value={row.venue} onChange={e=>upd(i,'venue',e.target.value)}><option>HOME</option><option>AWAY</option></select>
+                    <input style={_md_inp} placeholder="7 Jun" value={row.date} onChange={e=>upd(i,'date',e.target.value)} />
+                    <input style={{..._md_inp,fontFamily:'var(--font-mono)'}} placeholder="15:00" value={row.kickoff} onChange={e=>upd(i,'kickoff',e.target.value)} />
+                  </div>
+                ))}
+                <button className="btn sm" onClick={addRow} style={{ marginBottom:14 }}>+ Add row</button>
+                <div style={{ display:'flex',gap:10 }}>
+                  <button className="btn primary" onClick={saveManual} disabled={!rows.some(r=>r.opp&&r.date)} style={{ flex:1 }}>Save {rows.filter(r=>r.opp&&r.date).length} fixture(s)</button>
+                  <button className="btn" onClick={onClose}>Cancel</button>
+                </div>
+              </div>
+            )}
+
+            {tab === 'csv' && (
+              <div>
+                <div style={{ fontSize:12,color:'var(--muted)',marginBottom:8 }}>CSV columns: <code>Opposition, Venue (HOME/AWAY), Date (7 Jun), Kickoff (15:00), Type</code></div>
+                <textarea style={{ ..._md_inp, resize:'vertical', minHeight:160, fontFamily:'var(--font-mono)', fontSize:12 }}
+                  placeholder={'Stellenbosch Stormers, HOME, 7 Jun, 15:00, League\nUCT, AWAY, 14 Jun, 15:00, League'}
+                  value={csv} onChange={e=>setCsv(e.target.value)} />
+                <div style={{ display:'flex',gap:10,marginTop:12 }}>
+                  <button className="btn primary" onClick={saveCSV} disabled={!csv.trim()} style={{ flex:1 }}>Import CSV</button>
+                  <button className="btn" onClick={onClose}>Cancel</button>
+                </div>
+              </div>
+            )}
+
+            {tab === 'paste' && (
+              <div>
+                <div style={{ fontSize:12,color:'var(--muted)',marginBottom:8 }}>Paste your fixture list from any document, spreadsheet, or message. The AI will extract dates and teams automatically.</div>
+                <textarea style={{ ..._md_inp, resize:'vertical', minHeight:160, fontSize:13 }}
+                  placeholder={'e.g.\n7 Jun vs Stellenbosch Stormers – Home – 3pm\n14 Jun UCT (Away)\nJun 21 – Goodwood (Home)'}
+                  value={paste} onChange={e=>setPaste(e.target.value)} />
+                <div style={{ display:'flex',gap:10,marginTop:12 }}>
+                  <button className="btn primary" onClick={savePaste} disabled={!paste.trim()} style={{ flex:1 }}>Parse & import</button>
+                  <button className="btn" onClick={onClose}>Cancel</button>
+                </div>
+              </div>
+            )}
+
+            <div style={{ borderTop:'1px solid var(--border)',marginTop:16,paddingTop:12,fontSize:12,color:'var(--muted)',display:'flex',gap:12 }}>
+              <span>Or go to</span>
+              <button className="btn sm" onClick={()=>{ onClose(); (window.navTo||onNav)?.('onboarding'); }}>Season Setup →</button>
+              <button className="btn sm" onClick={()=>{ onClose(); (window.navTo||onNav)?.('calendar'); }}>Calendar →</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 /* ---- Container ---- */
 const MatchDay = ({ onNav }) => {
   const [mode, setMode] = React.useState('pre');
   const [xv, setXv] = React.useState(DEFAULT_XV);
   const [bench, setBench] = React.useState(DEFAULT_BENCH);
-  const next = FIXTURES.find(f => f.upcoming);
+  const [showAddFixture, setShowAddFixture] = React.useState(false);
+  const [version, setVersion] = React.useState(0);
+  const next = FIXTURES.find(f => !f.result) || null;
   const getPlayer = id => SQUAD.find(p => p.n === id);
+  const teamShort = (window.teamInfo?.short && window.teamInfo.short !== '—'
+    ? window.teamInfo.short
+    : (window.teamInfo?.name || 'Home').split(' ').map(w => w[0]).join('')
+  ).slice(0, 4).toUpperCase();
+
+  if (!next && FIXTURES.length === 0) {
+    return (
+      <div className="page">
+        <div className="page-head"><div><div className="eyebrow">Match Day</div><h1>No fixtures yet</h1></div></div>
+        <div className="card" style={{ padding: '40px 24px', textAlign: 'center', marginTop: 8 }}>
+          <div style={{ fontSize: 36, marginBottom: 12 }}>▣</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 600, marginBottom: 8 }}>No fixtures scheduled</div>
+          <div className="muted" style={{ fontSize: 14, marginBottom: 20 }}>Add your fixtures to unlock Match Day.</div>
+          <div style={{ display:'flex',gap:10,justifyContent:'center',flexWrap:'wrap' }}>
+            <button className="btn primary" onClick={() => setShowAddFixture(true)}>+ Add fixtures</button>
+            <button className="btn" onClick={() => (onNav||window.navTo)?.('onboarding')}>Season setup →</button>
+            <button className="btn" onClick={() => (onNav||window.navTo)?.('calendar')}>Open Calendar →</button>
+          </div>
+        </div>
+        {showAddFixture && <AddFixtureModal onClose={() => setShowAddFixture(false)} onSaved={() => setVersion(v=>v+1)} />}
+      </div>
+    );
+  }
 
   return (
     <div className="page" style={{ paddingBottom: mode === 'sideline' ? 0 : 60 }}>
       <div className="page-head">
         <div>
-          <div className="eyebrow">Match Day · Saturday 14 Jun · 15:00</div>
-          <h1>Pumas <span className="muted">vs</span> {next.opp}</h1>
-          <div className="meta">{next.venue} · Round 8 League · Sportground 1</div>
+          <div className="eyebrow">Match Day · {next ? `${next.date} · ${next.kickoff || '15:00'} KO` : 'Season complete'}</div>
+          <h1>{teamShort} <span className="muted">vs</span> {next?.opp || '—'}</h1>
+          <div className="meta">{next?.venue || ''}{next ? ' · League · Home Ground' : ''}</div>
         </div>
         <div className="modebar">
           <button className={mode === 'pre' ? 'active' : ''} onClick={() => setMode('pre')}>Pre-match</button>

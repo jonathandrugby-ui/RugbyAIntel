@@ -100,7 +100,7 @@ const KickingAnalytics = () => {
     <div className="page" style={{ paddingBottom: 60 }}>
       <div className="page-head">
         <div>
-          <div className="eyebrow">Performance Analytics · 2024 Season</div>
+          <div className="eyebrow">Performance Analytics · {SEASON_YEAR} Season</div>
           <h1>Territory &amp; Kicking</h1>
           <div className="meta">
             {KICK_MATCHES.length} matches · exit avg {avgExit}% · entry avg {avgEntry}%

@@ -220,7 +220,7 @@ const VideoClips = () => {
     <div className="page" style={{ paddingBottom: 60 }}>
       <div className="page-head">
         <div>
-          <div className="eyebrow">Match library · 2024 season</div>
+          <div className="eyebrow">Match library · {SEASON_YEAR} season</div>
           <h1>Video clips</h1>
           <div className="meta">{SAMPLE_CLIPS.length} clips · {Object.values(pendingTags).flat().length} pending tags · auto-tagged by AI</div>
         </div>

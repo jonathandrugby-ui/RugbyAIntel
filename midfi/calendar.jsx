@@ -2,7 +2,7 @@
 
 const SeasonCalendar = ({ practices, jumpToPractice, addPractice }) => {
   const [view, setView] = React.useState('season'); // season | month | list
-  const [monthIdx, setMonthIdx] = React.useState(5); // June default
+  const [monthIdx, setMonthIdx] = React.useState(() => Math.min(new Date().getMonth(), MONTHS.length - 1));
   const [showMatches, setShowMatches] = React.useState(true);
   const [showPractices, setShowPractices] = React.useState(true);
 
@@ -10,7 +10,7 @@ const SeasonCalendar = ({ practices, jumpToPractice, addPractice }) => {
   const eventsByDate = React.useMemo(() => {
     const map = {};
     FIXTURES.forEach(f => {
-      const iso = FIXTURE_DATES[f.date];
+      const iso = dateStrToISO(f.date) || FIXTURE_DATES[f.date];
       if (!iso) return;
       (map[iso] ||= []).push({ kind: 'match', f });
     });
@@ -41,7 +41,7 @@ const SeasonCalendar = ({ practices, jumpToPractice, addPractice }) => {
     <div className="page">
       <div className="page-head">
         <div>
-          <div className="eyebrow">2024 Season · Jan – Aug</div>
+          <div className="eyebrow">{SEASON_YEAR} Season · {MONTHS[0].slice(0,3)} – {MONTHS[MONTHS.length-1].slice(0,3)}</div>
           <h1>Season calendar</h1>
           <div className="meta">{totalMatches} fixtures · {totalPractices} practices · {MONTHS.length} months in view</div>
         </div>
@@ -456,7 +456,7 @@ const ListView = ({ eventsByDate, showMatches, showPractices }) => {
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--ink-soft)' }}>
                   {isMatch
-                    ? `${e.f.type} · ${e.f.upcoming ? 'upcoming' : `${e.f.f}–${e.f.a} ${e.f.result === 'W' ? 'win' : 'loss'}`}`
+                    ? `${e.f.type} · ${e.f ? 'upcoming' : `${e.f.f}–${e.f.a} ${e.f.result === 'W' ? 'win' : 'loss'}`}`
                     : `${e.p.start}–${e.p.end} · ${e.p.drills.length} drills`}
                 </div>
               </div>

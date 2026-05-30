@@ -86,7 +86,7 @@ const BreakdownEfficiency = () => {
     <div className="page" style={{ paddingBottom: 60 }}>
       <div className="page-head">
         <div>
-          <div className="eyebrow">Performance Analytics · 2024 Season</div>
+          <div className="eyebrow">Performance Analytics · {SEASON_YEAR} Season</div>
           <h1>Collision &amp; Breakdown</h1>
           <div className="meta">
             {BD_MATCHES.length} matches · tackle {avgTackle}% · ruck win {avgRuckWin}% · fast ruck {fastPct}%

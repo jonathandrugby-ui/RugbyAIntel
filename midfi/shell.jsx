@@ -26,8 +26,9 @@ const useTeamSetup = () => {
   const [teamInfo, setTeamInfo] = React.useState(() => {
     try {
       const raw = localStorage.getItem(TEAM_KEY_V2);
-      if (raw) { const d = JSON.parse(raw); return d.team || TEAM_DEFAULTS; }
+      if (raw) { const d = JSON.parse(raw); const t = d.team || TEAM_DEFAULTS; window.teamInfo = t; return t; }
     } catch {}
+    window.teamInfo = TEAM_DEFAULTS;
     return TEAM_DEFAULTS;
   });
 
@@ -37,6 +38,7 @@ const useTeamSetup = () => {
     /* Keep window globals in sync so other components see the update */
     window.SQUAD    = SQUAD;
     window.FIXTURES = FIXTURES;
+    window.teamInfo = team;
     const data = { team, squad: SQUAD, fixtures: FIXTURES };
     try { localStorage.setItem(TEAM_KEY_V2, JSON.stringify(data)); } catch {}
     setTeamInfo(team);
@@ -52,6 +54,7 @@ const useTeamSetup = () => {
       localStorage.removeItem(TEAM_KEY_V2);
       localStorage.removeItem('rugbyai_practices_v1');
     } catch {}
+    window.teamInfo = TEAM_DEFAULTS;
     setTeamInfo(TEAM_DEFAULTS);
     setHasSetup(false);
   };
@@ -159,7 +162,7 @@ const Sidebar = ({ active, onNav, onCollapse, teamInfo, squadCount }) => {
   );
 };
 
-const TopBar = ({ crumb, right, sidebarOpen, onToggleSidebar }) => (
+const TopBar = ({ crumb, right, sidebarOpen, onToggleSidebar, onHelp, onAlerts, onTour }) => (
   <header className="topbar">
     <button
       className="btn ghost sm topbar-toggle-btn"
@@ -178,8 +181,8 @@ const TopBar = ({ crumb, right, sidebarOpen, onToggleSidebar }) => (
     </div>
     {right || (
       <>
-        <button className="btn ghost sm" title="Notifications">⏰</button>
-        <button className="btn sm">Help</button>
+        <button className="btn ghost sm" title="Upcoming matches & reminders" onClick={onAlerts}>⏰</button>
+        <button className="btn sm" onClick={onHelp}>Help</button>
       </>
     )}
   </header>

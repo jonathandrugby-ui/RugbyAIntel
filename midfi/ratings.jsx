@@ -52,7 +52,7 @@ const RatingCell = ({ v, max = 10 }) => {
 };
 
 const Ratings = () => {
-  const lastMatch = FIXTURES.filter(f => !f.upcoming).slice(-1)[0];
+  const lastMatch = FIXTURES.filter(f => f.result).slice(-1)[0];
   const getPlayer = id => SQUAD.find(p => p.n === id);
 
   /* Build same XV as match-day */

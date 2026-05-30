@@ -11,7 +11,7 @@ const SAMPLE_THREADS = [
 
 const Analyst = () => {
   const [input, setInput] = React.useState('');
-  const next = FIXTURES.find(f => f.upcoming);
+  const next = FIXTURES.find(f => !f.result);
 
   return (
     <div className="page" style={{ padding: '14px 18px 0', display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - var(--topbar-h))' }}>
@@ -223,7 +223,7 @@ const Analyst = () => {
           <div className="col" style={{ gap: 8 }}>
             {[
               ['Squad List', '27 players', true],
-              ['Fixtures 2024', '15 games', true],
+              ['Fixtures ' + SEASON_YEAR, FIXTURES.length + ' games', true],
               ['Match Ratings', '12 games', true],
               ['UCT head-to-head', '7 matches · 3yr', true],
               ['Lingo Reference', 'attack + defence', true],
@@ -249,7 +249,7 @@ const Analyst = () => {
           <div className="col" style={{ gap: 6 }}>
             <button className="chip" style={{ justifyContent: 'flex-start', width: '100%' }}>Summarize last 3 matches</button>
             <button className="chip" style={{ justifyContent: 'flex-start', width: '100%' }}>Who's in red-zone fatigue?</button>
-            <button className="chip" style={{ justifyContent: 'flex-start', width: '100%' }}>Compare us vs {next.opp} (UCT)</button>
+            <button className="chip" style={{ justifyContent: 'flex-start', width: '100%' }}>Compare us vs {next?.opp} (UCT)</button>
             <button className="chip" style={{ justifyContent: 'flex-start', width: '100%' }}>Draft parent update — week 14</button>
           </div>
 

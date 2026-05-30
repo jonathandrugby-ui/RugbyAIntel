@@ -207,8 +207,8 @@ const MONTHS = ['January','February','March','April','May','June','July','August
 const MONTH_NAMES_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const DAY_NAMES_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-const SEASON_YEAR = 2024;
-const TODAY_ISO = '2024-06-13'; /* simulate "today" for the wireframe */
+const SEASON_YEAR = 2026;
+const TODAY_ISO = new Date().toISOString().slice(0, 10); /* real today */
 
 /* Build YYYY-MM-DD without timezone surprises */
 const toISO = (y, m, d) =>
@@ -224,17 +224,31 @@ const parseISO = (iso) => {
 const daysInMonth = (y, m) => new Date(y, m + 1, 0).getDate();
 const firstDayOfMonth = (y, m) => new Date(y, m, 1).getDay(); // 0=Sun
 
-/* Match the season's fixtures with their date and ISO */
+/* Parse a date string in either "7 Jun" or "Jun 7" format → ISO YYYY-MM-DD */
+const _MONTH_MAP = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+const dateStrToISO = (str) => {
+  if (!str) return null;
+  const parts = str.trim().split(/\s+/);
+  if (parts.length < 2) return null;
+  let day, mon;
+  if (isNaN(+parts[0])) { mon = parts[0]; day = +parts[1]; }  // "Jun 7"
+  else                   { day = +parts[0]; mon = parts[1]; }  // "7 Jun"
+  const m = _MONTH_MAP[mon];
+  if (m == null || !day) return null;
+  return toISO(SEASON_YEAR, m, day);
+};
+
+/* Legacy lookup table — kept for backward compat with hardcoded demo data */
 const FIXTURE_DATES = {
-  'Feb 16': '2024-02-16', 'Feb 24': '2024-02-24',
-  'Mar 9':  '2024-03-09', 'Mar 16': '2024-03-16', 'Mar 23': '2024-03-23', 'Mar 30': '2024-03-30',
-  'Apr 6':  '2024-04-06', 'Apr 13': '2024-04-13', 'Apr 20': '2024-04-20',
-  'May 4':  '2024-05-04', 'May 11': '2024-05-11', 'May 25': '2024-05-25',
-  'Jun 14': '2024-06-14', 'Jun 21': '2024-06-21', 'Jun 28': '2024-06-28',
+  'Feb 16': '2026-02-16', 'Feb 24': '2026-02-24',
+  'Mar 9':  '2026-03-09', 'Mar 16': '2026-03-16', 'Mar 23': '2026-03-23', 'Mar 30': '2026-03-30',
+  'Apr 6':  '2026-04-06', 'Apr 13': '2026-04-13', 'Apr 20': '2026-04-20',
+  'May 4':  '2026-05-04', 'May 11': '2026-05-11', 'May 25': '2026-05-25',
+  'Jun 14': '2026-06-14', 'Jun 21': '2026-06-21', 'Jun 28': '2026-06-28',
 };
 
 const fixtureFor = (iso) =>
-  FIXTURES.find(f => FIXTURE_DATES[f.date] === iso);
+  FIXTURES.find(f => (dateStrToISO(f.date) || FIXTURE_DATES[f.date]) === iso);
 
 /* Sunday-anchored week start for any iso date */
 const startOfWeek = (iso) => {
@@ -349,6 +363,6 @@ Object.assign(window, {
   SEED_PRACTICES, MONTHS, MONTH_NAMES_SHORT, DAY_NAMES_SHORT,
   SEASON_YEAR, TODAY_ISO,
   toISO, parseISO, daysInMonth, firstDayOfMonth,
-  FIXTURE_DATES, fixtureFor, startOfWeek, addDays, formatWeekRange,
+  FIXTURE_DATES, dateStrToISO, fixtureFor, startOfWeek, addDays, formatWeekRange,
   usePractices,
 });

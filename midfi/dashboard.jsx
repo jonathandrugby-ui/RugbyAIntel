@@ -1,8 +1,86 @@
 /* RugbyAI mid-fi — Season Dashboard */
 
-const Dashboard = () => {
-  const playedFixtures = FIXTURES.filter(f => !f.upcoming);
-  const upcomingFixtures = FIXTURES.filter(f => f.upcoming);
+/* ── Log Result modal ── */
+const LogResultModal = ({ onClose, onSaved }) => {
+  const upcoming = FIXTURES.filter(f => !f.result);
+  const [sel, setSel]     = React.useState(upcoming[0] ? FIXTURES.indexOf(upcoming[0]) : -1);
+  const [ptsFor, setPtsFor]   = React.useState('');
+  const [ptsAga, setPtsAga]   = React.useState('');
+  const [tries, setTries]  = React.useState('');
+  const [note, setNote]    = React.useState('');
+
+  const save = () => {
+    if (sel < 0 || ptsFor === '' || ptsAga === '') return;
+    const f = parseInt(ptsFor), a = parseInt(ptsAga);
+    const result = f > a ? 'W' : f < a ? 'L' : 'D';
+    FIXTURES[sel] = { ...FIXTURES[sel], result, f, a, tries: parseInt(tries)||0, note };
+    try {
+      const raw = localStorage.getItem('rugbyai_team_v2');
+      if (raw) {
+        const d = JSON.parse(raw);
+        d.fixtures = FIXTURES;
+        localStorage.setItem('rugbyai_team_v2', JSON.stringify(d));
+      }
+    } catch {}
+    onSaved();
+    onClose();
+  };
+
+  const styles = { input: { width:'100%',padding:'8px 10px',border:'1px solid var(--border)',borderRadius:8,fontSize:14,fontFamily:'var(--font-mono)',boxSizing:'border-box',background:'#fff' } };
+  return (
+    <div onClick={onClose} style={{ position:'fixed',inset:0,background:'rgba(0,0,0,.45)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:20 }}>
+      <div onClick={e => e.stopPropagation()} style={{ background:'var(--paper)',borderRadius:14,width:'100%',maxWidth:480,boxShadow:'0 20px 60px rgba(0,0,0,.3)' }}>
+        <div style={{ padding:'22px 24px 0',display:'flex',justifyContent:'space-between',alignItems:'flex-start' }}>
+          <div style={{ fontFamily:'var(--font-display)',fontSize:20,fontWeight:700 }}>Log a result</div>
+          <button onClick={onClose} style={{ background:'none',border:'none',fontSize:22,cursor:'pointer',color:'var(--muted)' }}>×</button>
+        </div>
+        <div style={{ padding:'16px 24px 24px',display:'flex',flexDirection:'column',gap:14 }}>
+          <div>
+            <div style={{ fontSize:12,fontWeight:600,marginBottom:6,textTransform:'uppercase',letterSpacing:.06 }}>Match</div>
+            <select style={styles.input} value={sel} onChange={e => setSel(+e.target.value)}>
+              {upcoming.length === 0 && <option value={-1}>— No upcoming fixtures —</option>}
+              {FIXTURES.map((f,i) => !f.result && <option key={i} value={i}>{f.date} · vs {f.opp} ({f.venue})</option>)}
+            </select>
+          </div>
+          <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10 }}>
+            <div>
+              <div style={{ fontSize:12,fontWeight:600,marginBottom:6 }}>Our score</div>
+              <input style={styles.input} type="number" min="0" placeholder="e.g. 24" value={ptsFor} onChange={e => setPtsFor(e.target.value)} />
+            </div>
+            <div>
+              <div style={{ fontSize:12,fontWeight:600,marginBottom:6 }}>Their score</div>
+              <input style={styles.input} type="number" min="0" placeholder="e.g. 18" value={ptsAga} onChange={e => setPtsAga(e.target.value)} />
+            </div>
+            <div>
+              <div style={{ fontSize:12,fontWeight:600,marginBottom:6 }}>Tries scored</div>
+              <input style={styles.input} type="number" min="0" placeholder="e.g. 3" value={tries} onChange={e => setTries(e.target.value)} />
+            </div>
+          </div>
+          {ptsFor !== '' && ptsAga !== '' && (
+            <div style={{ background: parseInt(ptsFor)>parseInt(ptsAga) ? 'rgba(67,160,71,.1)' : parseInt(ptsFor)<parseInt(ptsAga) ? 'rgba(229,57,53,.1)' : 'var(--sand)', borderRadius:8, padding:'10px 14px', fontSize:14, fontWeight:600, color: parseInt(ptsFor)>parseInt(ptsAga) ? 'var(--ok)' : parseInt(ptsFor)<parseInt(ptsAga) ? 'var(--warn)' : 'var(--ink)' }}>
+              {parseInt(ptsFor)>parseInt(ptsAga) ? '✓ Win' : parseInt(ptsFor)<parseInt(ptsAga) ? '✗ Loss' : '— Draw'} · {ptsFor}–{ptsAga}
+            </div>
+          )}
+          <div>
+            <div style={{ fontSize:12,fontWeight:600,marginBottom:6 }}>Match notes (optional)</div>
+            <textarea style={{ ...styles.input, resize:'vertical', minHeight:64 }} placeholder="Key moments, player standouts, things to work on…" value={note} onChange={e => setNote(e.target.value)} />
+          </div>
+          <div style={{ display:'flex',gap:10,paddingTop:4 }}>
+            <button className="btn primary" onClick={save} disabled={sel<0||ptsFor===''||ptsAga===''} style={{ flex:1 }}>Save result</button>
+            <button className="btn" onClick={onClose}>Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Dashboard = ({ onNav }) => {
+  const [showLogResult, setShowLogResult] = React.useState(false);
+  const [version, setVersion] = React.useState(0); /* bump to re-read FIXTURES */
+
+  const playedFixtures = FIXTURES.filter(f => f.result);
+  const upcomingFixtures = FIXTURES.filter(f => !f.result);
   const wins       = playedFixtures.filter(f => f.result === 'W').length;
   const losses     = playedFixtures.filter(f => f.result === 'L').length;
   const totalF     = playedFixtures.reduce((a, f) => a + (f.f || 0), 0);
@@ -25,19 +103,22 @@ const Dashboard = () => {
             <div className="meta">No fixtures or squad data yet</div>
           </div>
           <div className="row gap-3">
-            <button className="btn primary"><span className="ico">+</span> Log result</button>
+            <button className="btn primary" onClick={() => setShowLogResult(true)}><span className="ico">+</span> Log result</button>
           </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginTop: 8 }}>
           {[
             { icon: '◇', label: 'Add your squad',    hint: 'Import players from the Squad screen', route: 'squad' },
-            { icon: '▦', label: 'Add fixtures',       hint: 'Build the season calendar',            route: 'calendar' },
+            { icon: '▦', label: 'Add fixtures',       hint: 'Build the season calendar',            route: 'onboarding' },
             { icon: '◔', label: 'Plan first practice', hint: 'Drop drills onto the practice planner', route: 'practice' },
           ].map(c => (
-            <div key={c.route} className="card paper" style={{ padding: '24px 20px' }}>
+            <div key={c.route} className="card paper" style={{ padding: '24px 20px', cursor:'pointer', transition:'box-shadow .15s' }} onClick={() => onNav && onNav(c.route)}
+              onMouseEnter={e => e.currentTarget.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'}
+              onMouseLeave={e => e.currentTarget.style.boxShadow='none'}>
               <div style={{ fontSize: 28, marginBottom: 10, color: 'var(--primary)' }}>{c.icon}</div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 600, marginBottom: 6 }}>{c.label}</div>
               <div className="muted" style={{ fontSize: 13, marginBottom: 16 }}>{c.hint}</div>
+              <div style={{ fontSize:12,fontWeight:600,color:'var(--primary)' }}>Go →</div>
             </div>
           ))}
         </div>
@@ -61,7 +142,7 @@ const Dashboard = () => {
         </div>
         <div className="row gap-3">
           <button className="btn">Export season report</button>
-          <button className="btn primary"><span className="ico">+</span> Log result</button>
+          <button className="btn primary" onClick={() => setShowLogResult(true)}><span className="ico">+</span> Log result</button>
         </div>
       </div>
 
@@ -318,6 +399,8 @@ const Dashboard = () => {
         <span>Last sync · {new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}</span>
         <span>RugbyAI · {new Date().getFullYear()} season</span>
       </div>
+
+      {showLogResult && <LogResultModal onClose={() => setShowLogResult(false)} onSaved={() => setVersion(v => v+1)} />}
     </div>
   );
 };

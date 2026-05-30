@@ -63,7 +63,7 @@ const SetPieceTrends = () => {
     <div className="page" style={{ paddingBottom: 60 }}>
       <div className="page-head">
         <div>
-          <div className="eyebrow">Performance Analytics · 2024 Season</div>
+          <div className="eyebrow">Performance Analytics · {SEASON_YEAR} Season</div>
           <h1>Set Piece Trends</h1>
           <div className="meta">
             {withPct.length} matches · lineout avg {avgLo}% · scrum avg {avgSc}%
